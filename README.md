@@ -41,6 +41,52 @@ This command will move the starter code to the **app-example** directory and cre
 - If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
 - Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
 
+## Verificando versões do ambiente
+
+Comandos úteis pra conferir o que está instalado (Node, nvm, Expo, dependências do
+projeto, ferramentas de qualidade e Git).
+
+### Node.js e nvm
+
+```bash
+node -v                    # versão do Node.js ativa nesta sessão do terminal
+npm -v                     # versão do npm ativa
+nvm current                # versão do Node que o nvm está usando agora
+nvm ls                     # lista as versões do Node já instaladas via nvm
+nvm ls-remote --lts         # lista as versões LTS disponíveis pra instalar
+nvm alias default           # mostra qual versão é a padrão do nvm (usada em novos terminais)
+```
+
+### Projeto Expo / React Native / TypeScript
+
+```bash
+npx expo --version                 # versão do Expo CLI
+npx expo config                    # mostra a configuração final do app (app.json + defaults)
+npx expo-doctor                    # verifica se as dependências estão compatíveis com a SDK do projeto
+npx expo install --check           # lista pacotes cuja versão não bate com a esperada pela SDK
+cat package.json | grep '"expo"'   # versão da SDK do Expo travada neste projeto
+npm list --depth=0                 # versão de todas as dependências diretas instaladas
+npm outdated                       # mostra quais dependências têm versão mais nova disponível
+npx tsc --version                  # versão do TypeScript
+```
+
+### ESLint e Prettier
+
+```bash
+npx eslint --version       # versão do ESLint
+npx prettier --version     # versão do Prettier
+npm run lint                # roda o ESLint no projeto (expo lint)
+npm run format               # formata o projeto inteiro com o Prettier
+```
+
+### Git
+
+```bash
+git --version                      # versão do Git instalada
+git config --global --list         # identidade configurada (user.name / user.email) e outras opções globais
+git log --oneline                  # histórico de commits deste repositório
+```
+
 ## Learn more
 
 To learn more about developing your project with Expo, look at the following resources:
