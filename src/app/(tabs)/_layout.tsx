@@ -1,0 +1,39 @@
+import { Tabs } from 'expo-router';
+import { Platform } from 'react-native';
+import { Icon, useTheme } from 'react-native-paper';
+
+export default function TabsLayout() {
+  const theme = useTheme();
+  return (
+    <Tabs
+      initialRouteName="home"
+      screenOptions={{
+        tabBarActiveTintColor: theme.colors.primary,
+        headerShown: false,
+        tabBarStyle: Platform.select({
+          ios: {
+            position: 'absolute',
+          },
+          default: { backgroundColor: theme.colors.background },
+        }),
+      }}
+    >
+      <Tabs.Screen
+        name="home"
+        options={{
+          title: 'Home',
+          tabBarIcon: ({ color }) => (
+            <Icon source="account-group" color={theme.colors.primary} size={20} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="menu"
+        options={{
+          title: 'Menu',
+          tabBarIcon: ({ color }) => <Icon source="menu" color={theme.colors.primary} size={20} />,
+        }}
+      />
+    </Tabs>
+  );
+}
