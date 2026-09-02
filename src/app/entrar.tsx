@@ -1,12 +1,15 @@
 import { AuthContext } from '@/context/AuthProvider';
+import { Credentials } from '@/model/types';
 import { router } from 'expo-router';
 import { useContext, useState } from 'react';
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useTheme } from 'react-native-paper';
 
-export default function Entrar() {
+export default function Entrar(data: Credentials) {
+  const theme = useTheme<any>();
   const { signIn } = useContext<any>(AuthContext);
-  const [email, setEmail] = useState('teste@gmail.com');
-  const [senha, setSenha] = useState('');
+  const [email, setEmail] = useState(data.email);
+  const [senha, setSenha] = useState(data.senha);
   const [erro, setErro] = useState('');
 
   async function handleEntrar() {
@@ -39,7 +42,7 @@ export default function Entrar() {
         secureTextEntry
       />
 
-      {erro ? <Text style={styles.erro}>{erro}</Text> : null}
+      {erro ? <Text>{erro}</Text> : null}
 
       <Button title="Entrar" onPress={handleEntrar} />
     </View>
@@ -50,5 +53,4 @@ const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', padding: 24, gap: 12 },
   titulo: { fontSize: 24, fontWeight: 'bold', textAlign: 'center' },
   input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 6, padding: 10 },
-  erro: { color: 'red', textAlign: 'center' },
 });
