@@ -10,11 +10,6 @@ export const UserContext = createContext<any>({});
 export const UserProvider = ({ children }: any) => {
   const { userAuth, delAccount } = useContext(AuthContext);
   const [usuerFirebase, setUserFirebase] = useState<Usuario | null>(null);
-  useEffect(() => {
-    if (userAuth) {
-      getUser();
-    }
-  }, [userAuth]);
 
   //busca os detalhes do usuário
   async function getUser(): Promise<void> {
@@ -39,6 +34,12 @@ export const UserProvider = ({ children }: any) => {
       console.error('UserProvider, getUser: ' + e);
     }
   }
+
+  useEffect(() => {
+    if (userAuth) {
+      getUser();
+    }
+  }, [userAuth]);
 
   async function update(usuario: Usuario): Promise<string> {
     try {

@@ -96,13 +96,11 @@ export default function Perfil({ navigation }: any) {
       <ScrollView>
         <>
           <Image
-            style={styles.image}
-            source={require('../assets/images/person.png')}
-            loadingIndicatorSource={require('../assets/images/person.png')}
+            source={require('../../assets/images/icon.png')}
+            loadingIndicatorSource={require('../../assets/images/icon.png')}
           />
-          <View style={styles.divButtonsImage}>
+          <View>
             <Button
-              style={styles.buttonImage}
               mode="outlined"
               icon="image"
               onPress={() => alert('Isso será desenvolvido na branch modulo2_upload_imagen))')}
@@ -110,7 +108,6 @@ export default function Perfil({ navigation }: any) {
               Galeria
             </Button>
             <Button
-              style={styles.buttonImage}
               mode="outlined"
               icon="camera"
               onPress={() => alert('Isso será desenvolvido na branch modulo2_upload_imagen))')}

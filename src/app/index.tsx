@@ -32,7 +32,7 @@ export default function PreloadScreen() {
     <View style={{ ...styles.container, backgroundColor: theme.colors.background }}>
       <Image
         style={styles.imagem}
-        source={require('../assets/images/logo512.png')}
+        source={require('../../assets/images/icon.png')}
         accessibilityLabel="logo do app"
       />
     </View>

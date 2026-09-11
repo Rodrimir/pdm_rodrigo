@@ -73,7 +73,7 @@ export default function Entrar() {
     <SafeAreaView style={{ ...styles.container, backgroundColor: theme.colors.background }}>
       <ScrollView>
         <>
-          <Image style={styles.image} source={require('../assets/images/logo512.png')} />
+          <Image style={styles.image} source={require('../../assets/images/icon.png')} />
           <Controller
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
