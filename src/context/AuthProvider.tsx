@@ -13,7 +13,7 @@ import {
 import { doc, setDoc } from 'firebase/firestore';
 import { createContext, useState } from 'react';
 
-export const AuthContext = createContext({});
+export const AuthContext = createContext<any>({});
 
 export const AuthProvider = ({ children }: any) => {
   const [userAuth, setUserAuth] = useState<UserCredential | null>(null);
@@ -77,7 +77,7 @@ export const AuthProvider = ({ children }: any) => {
     }
   }
 
-  async function signIn(credencial: Credencial): Promise<string> {
+  async function entrar(credencial: Credencial): Promise<string> {
     try {
       const userCredencial = await signInWithEmailAndPassword(
         auth,
@@ -136,7 +136,7 @@ export const AuthProvider = ({ children }: any) => {
   return (
     <AuthContext.Provider
       value={{
-        signIn,
+        entrar,
         sair,
         recuperaCredencialdaCache,
         signUp,

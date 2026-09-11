@@ -5,12 +5,11 @@ import { deleteDoc, doc, getDoc, setDoc } from 'firebase/firestore';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { AuthContext } from './AuthProvider';
 
-export const UserContext = createContext({});
+export const UserContext = createContext<any>({});
 
 export const UserProvider = ({ children }: any) => {
   const { userAuth, delAccount } = useContext(AuthContext);
   const [usuerFirebase, setUserFirebase] = useState<Usuario | null>(null);
-
   useEffect(() => {
     if (userAuth) {
       getUser();

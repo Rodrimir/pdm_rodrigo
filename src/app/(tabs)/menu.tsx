@@ -47,7 +47,7 @@ export default function Menu() {
         }}
       >
         <Dialog.Icon icon={'alert-circle-outline'} size={60} />
-        <Dialog.Title style={styles.textDialog}>'Ops!'</Dialog.Title>
+        <Dialog.Title style={styles.textDialog}>Ops!</Dialog.Title>
         <Dialog.Content>
           <Text style={styles.textDialog} variant="bodyLarge">
             {`Estamos com problemas para realizar essa operação.\nPor favor,
