@@ -42,10 +42,13 @@ export default function RootLayout() {
         <UserProvider>
           <StatusBar style="dark" />
           <Stack
+            initialRouteName="index"
             screenOptions={{
               headerShown: false,
             }}
           >
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="index" />
             <Stack.Screen name="entrar" />
             <Stack.Screen name="cadastrar" />
             <Stack.Screen name="recuperarSenha" />

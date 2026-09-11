@@ -7,27 +7,26 @@ import { useTheme } from 'react-native-paper';
 
 export default function PreloadScreen() {
   const theme = useTheme();
-  const { recuperaCredencialdaCache, signIn } = useContext < any > AuthContext;
-
-  useEffect(() => {
-    //ao montar o componente tenta logar com as credenciais da cache
-    logar();
-  }, []);
+  const { recuperaCredencialdaCache, entrar } = useContext<any>(AuthContext);
 
   async function logar() {
     const credencial = await recuperaCredencialdaCache();
     if (credencial !== 'null') {
       //se tem credenciais armazenadas tenta logar
-      const mensagem = await signIn(credencial);
+      const mensagem = await entrar(credencial);
       if (mensagem === 'ok') {
-        //await buscaUsuario(); //TODO: isso está desenvolvido na branch modulo1_perfil
-        router.replace('/home');
+        router.replace('/(tabs)/home');
       } else {
-        //se não consegue logar vai para a tela de login
-        router.replace('/signIn');
+        router.replace('/entrar');
       }
+    } else {
+      router.replace('/entrar');
     }
   }
+
+  useEffect(() => {
+    logar();
+  }, []);
 
   return (
     <View style={{ ...styles.container, backgroundColor: theme.colors.background }}>

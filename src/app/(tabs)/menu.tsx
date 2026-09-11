@@ -24,7 +24,7 @@ export default function Menu() {
         title="Perfil"
         description="Atualize seu perfil ou exclua sua conta"
         left={() => <List.Icon color={theme.colors.primary} icon="smart-card-outline" />}
-        onPress={() => router.push('../Perfil')}
+        onPress={() => router.push('../perfil')}
       />
       <Divider />
       <List.Item
