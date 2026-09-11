@@ -54,3 +54,7 @@ const styles = StyleSheet.create({
   titulo: { fontSize: 24, fontWeight: 'bold', textAlign: 'center' },
   input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 6, padding: 10 },
 });
+
+
+
+//FAZER RECUPERAR SENHA, FAZER USUARIO, ALTERAR NOME, ALTERAR SENHAREGREX, SINOUT, SINGIN. 

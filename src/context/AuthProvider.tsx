@@ -1,4 +1,6 @@
 import { auth } from '@/firebase/firebaseInit';
+import { Credentials } from '@/model/types';
+import * as SecureStore from 'expo-secure-store';
 import { signOut as firebaseSignOut, signInWithEmailAndPassword } from 'firebase/auth';
 import { createContext, useEffect } from 'react';
 
@@ -7,9 +9,10 @@ export const AuthContext = createContext({});
 export const AuthProvider = ({ children }: any) => {
   useEffect(() => {}, []);
 
-  async function signIn(email: string, senha: string): Promise<string> {
+  async function signIn(credentials: Credentials): Promise<string> {
     try {
-      await signInWithEmailAndPassword(auth, email, senha);
+      await signInWithEmailAndPassword(auth, credentials.email, credentials.senha);
+      SecureStore.setItemAsync('user', JSON.stringify(credentials));
       return 'ok';
     } catch (e: any) {
       return launchServerMessageErro(e);

@@ -1,7 +1,11 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 import { firebaseConfig } from './firebaseConfig';
 
 const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
+
+//iniciar serviço de banco de d ados do firebase
+export const db = getFirestore(app);
