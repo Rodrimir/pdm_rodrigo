@@ -1,19 +1,60 @@
 import { AuthContext } from '@/context/AuthProvider';
 import { router } from 'expo-router';
-import { useContext } from 'react';
-import { Button, StyleSheet, View } from 'react-native';
+import { useContext, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { Dialog, Divider, List, Text, useTheme } from 'react-native-paper';
 
 export default function Menu() {
-  const { signOut } = useContext<any>(AuthContext);
+  const theme = useTheme();
+  const { sair } = useContext<any>(AuthContext);
+  const [dialogVisivel, setDialogVisivel] = useState(false);
 
   async function handleSair() {
-    await signOut();
-    router.replace('/entrar');
+    const confirmacao = await sair();
+    if (confirmacao === 'saiu!!') {
+      router.replace('/entrar');
+    } else {
+      setDialogVisivel(true);
+    }
   }
 
   return (
-    <View style={styles.container}>
-      <Button title="Sair" onPress={handleSair} />
+    <View style={{ ...styles.container, backgroundColor: theme.colors.background }}>
+      <List.Item
+        title="Perfil"
+        description="Atualize seu perfil ou exclua sua conta"
+        left={() => <List.Icon color={theme.colors.primary} icon="smart-card-outline" />}
+        onPress={() => router.push('../Perfil')}
+      />
+      <Divider />
+      <List.Item
+        title="Alterar Senha"
+        description="Altere sua senha"
+        left={() => <List.Icon color={theme.colors.primary} icon="eye-arrow-right-outline" />}
+        onPress={() => alert('em desenvolvimento')}
+      />
+      <Divider />
+      <List.Item
+        title="Sair"
+        description="Finaliza sua sessão no aplicativo"
+        left={() => <List.Icon color={theme.colors.primary} icon="exit-run" />}
+        onPress={handleSair}
+      />
+      <Dialog
+        visible={dialogVisivel}
+        onDismiss={() => {
+          setDialogVisivel(false);
+        }}
+      >
+        <Dialog.Icon icon={'alert-circle-outline'} size={60} />
+        <Dialog.Title style={styles.textDialog}>'Ops!'</Dialog.Title>
+        <Dialog.Content>
+          <Text style={styles.textDialog} variant="bodyLarge">
+            {`Estamos com problemas para realizar essa operação.\nPor favor,
+            contate o administrador.`}
+          </Text>
+        </Dialog.Content>
+      </Dialog>
     </View>
   );
 }
@@ -21,7 +62,11 @@ export default function Menu() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingLeft: 20,
+    paddingTop: 50,
     alignItems: 'center',
-    justifyContent: 'center',
+  },
+  textDialog: {
+    textAlign: 'center',
   },
 });

@@ -1,9 +1,9 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-export default function HomeScreen() {
+export default function RecuperarSenhaScreen() {
   return (
     <View style={styles.container}>
-      <Text>Home Screen</Text>
+      <Text>RecuperarSenha Screen</Text>
     </View>
   );
 }

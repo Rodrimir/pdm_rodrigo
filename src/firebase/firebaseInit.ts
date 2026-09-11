@@ -8,4 +8,4 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 
 //iniciar serviço de banco de d ados do firebase
-export const db = getFirestore(app);
+export const firestore = getFirestore(app);
