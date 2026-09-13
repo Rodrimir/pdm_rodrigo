@@ -4,21 +4,13 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { router } from 'expo-router';
 import { useContext, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Image, SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Dialog, Divider, Text, TextInput, useTheme } from 'react-native-paper';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import * as yup from 'yup';
 
 const requiredMessage = 'Campo obrigatório';
 
-/*
-  /^
-  (?=.*\d)              // deve conter ao menos um dígito
-  (?=.*[a-z])           // deve conter ao menos uma letra minúscula
-  (?=.*[A-Z])           // deve conter ao menos uma letra maiúscula
-  (?=.*[$*&@#])         // deve conter ao menos um caractere especial
-  [0-9a-zA-Z$*&@#]{8,}  // deve conter ao menos 8 dos caracteres mencionados
-$/
-*/
 const schema = yup
   .object()
   .shape({
@@ -38,7 +30,7 @@ const schema = yup
 
 export default function Entrar() {
   const theme = useTheme();
-  const { signIn } = useContext<any>(AuthContext);
+  const { signIn } = useContext(AuthContext);
   const [exibirSenha, setExibirSenha] = useState(true);
   const [logando, setLogando] = useState(false);
   const [dialogVisivel, setDialogVisivel] = useState(false);
@@ -47,7 +39,7 @@ export default function Entrar() {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<any>({
+  } = useForm<Credencial>({
     defaultValues: {
       email: '',
       senha: '',

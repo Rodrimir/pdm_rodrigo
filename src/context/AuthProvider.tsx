@@ -91,7 +91,6 @@ export const AuthProvider = ({ children }: any) => {
       armazenaCredencialnaCache(credencial);
       return 'ok';
     } catch (error: any) {
-      console.error(error.code, error.message);
       return launchServerMessageErro(error);
     }
   }
@@ -102,7 +101,6 @@ export const AuthProvider = ({ children }: any) => {
       await signOut(auth);
       return 'ok';
     } catch (error: any) {
-      console.error(error.code, error.message);
       return launchServerMessageErro(error);
     }
   }
@@ -142,6 +140,7 @@ export const AuthProvider = ({ children }: any) => {
         signUp,
         userAuth,
         delAccount,
+        AuthProvider,
       }}
     >
       {children}
