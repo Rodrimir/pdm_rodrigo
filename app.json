@@ -33,7 +33,15 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
-      ]
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O app usa acesso às suas fotos para você escolher uma imagem de perfil.",
+          "cameraPermission": "O app usa a câmera para você tirar uma foto de perfil."
+        }
+      ],
+      "expo-asset"
     ],
     "experiments": {
       "typedRoutes": true,
