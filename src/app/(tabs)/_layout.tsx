@@ -2,6 +2,8 @@ import { Tabs } from 'expo-router';
 import { Platform } from 'react-native';
 import { Icon, useTheme } from 'react-native-paper';
 
+// Navegabilidade por BottomTab exigida no Modulo 1: define as abas Home e Menu,
+// que sao as rotas acessiveis depois que o usuario esta autenticado.
 export default function TabLayout() {
   const theme = useTheme();
 

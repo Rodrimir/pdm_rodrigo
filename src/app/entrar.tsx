@@ -11,6 +11,8 @@ import * as yup from 'yup';
 
 const requiredMessage = 'Campo obrigatório';
 
+// Schema do Yup usado pelo React Hook Form para validar o formulario
+// antes de qualquer chamada ao Firebase.
 const schema = yup
   .object()
   .shape({
@@ -28,6 +30,8 @@ const schema = yup
   })
   .required();
 
+// Tela de SignIn: formulario de email e senha, com link para o cadastro
+// e para a recuperacao de senha.
 export default function Entrar() {
   const theme = useTheme();
   const { signIn } = useContext(AuthContext);
@@ -48,6 +52,8 @@ export default function Entrar() {
     resolver: yupResolver(schema),
   });
 
+  // Chama o SignIn do provider e, quando da certo, troca a rota para as tabs.
+  // Qualquer erro vindo do Firebase e exibido em um Dialog.
   async function entrar(data: Credencial) {
     setLogando(true);
     const response = await signIn(data);
@@ -61,6 +67,7 @@ export default function Entrar() {
     }
   }
 
+  // Formulario montado com componentes do React Native Paper e Controller do Hook Form.
   return (
     <SafeAreaView style={{ ...styles.container, backgroundColor: theme.colors.background }}>
       <ScrollView>
@@ -169,6 +176,7 @@ export default function Entrar() {
   );
 }
 
+// Estilos da tela.
 const styles = StyleSheet.create({
   container: {
     flex: 1,

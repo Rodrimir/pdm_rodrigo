@@ -4,11 +4,11 @@ import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import { firebaseConfig } from './firebaseConfig';
 
+// Inicializa o app Firebase e exporta os servicos usados no projeto: Authentication, Firestore e Storage.
 const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
 
-//iniciar serviço de banco de d ados do firebase
 export const firestore = getFirestore(app);
 
 export const storage = getStorage(app);
