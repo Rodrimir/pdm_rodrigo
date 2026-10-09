@@ -1,4 +1,5 @@
 usar expo orbid e ImagePicker neste projeto TAREFA AULA 7 16/09/2026
+Instalar o EAS CLI para build de aplicativo aab e expo dev client 18/09/2026 - npm install --global eas-cli feito
 
 # Welcome to your Expo app 👋
 

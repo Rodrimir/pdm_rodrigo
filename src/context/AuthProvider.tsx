@@ -1,6 +1,7 @@
-import { auth, firestore } from '@/firebase/firebaseInit';
+import { auth, firestore, storage } from '@/firebase/firebaseInit';
 import { Credencial } from '@/model/types';
 import { Usuario } from '@/model/Usuario';
+import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import * as SecureStore from 'expo-secure-store';
 import {
   createUserWithEmailAndPassword,
@@ -11,6 +12,7 @@ import {
   UserCredential,
 } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { createContext, useState } from 'react';
 
 export const AuthContext = createContext<any>({});
@@ -40,6 +42,7 @@ export const AuthProvider = ({ children }: any) => {
       return credencial ? JSON.parse(credencial) : null;
     } catch (e) {
       console.error('AuthProvider, recuperaCredencialdaCache: ' + e);
+      console.log('Erro ao recuperar credencial da cache. Contate o suporte.');
       return null;
     }
   }
@@ -47,7 +50,7 @@ export const AuthProvider = ({ children }: any) => {
   /*
     Funções do processo de Autenticação
   */
-  async function signUp(usuario: Usuario): Promise<string> {
+  async function signUp(usuario: Usuario, urlDevice?: string): Promise<string> {
     try {
       if (usuario.email && usuario.senha) {
         const userCredential = await createUserWithEmailAndPassword(
@@ -57,6 +60,13 @@ export const AuthProvider = ({ children }: any) => {
         );
         if (userCredential) {
           await sendEmailVerification(userCredential.user);
+          if (urlDevice) {
+            const urlStorage = await sendImageToStorage(urlDevice, userCredential.user.uid);
+            if (!urlStorage) {
+              return 'Erro ao cadastrar o usuário. Contate o suporte.';
+            }
+            usuario.urlFoto = urlStorage;
+          }
         }
         //A senha não deve ser persistida no serviço Firetore, ela é gerida pelo serviço Authentication
         const usuarioFirestore = {
@@ -128,6 +138,36 @@ export const AuthProvider = ({ children }: any) => {
         return 'Email em uso. Tente outro email.';
       default:
         return 'Erro desconhecido. Contate o administrador';
+    }
+  }
+
+  //Função utilitária para envio de imagens para o serviço de Storage
+  //urlDevice: qual imagem que está no device que deve ser enviada via upload
+  async function sendImageToStorage(urlDevice: string, uid: string): Promise<string | null> {
+    try {
+      //1. Redimensiona, compacta a imagem, e a transforma em blob
+      const contexto = ImageManipulator.manipulate(urlDevice);
+      contexto.resize({ width: 150, height: 150 });
+      const imagemManipulada = await contexto.renderAsync();
+      const imagemRedimensionada = await imagemManipulada.saveAsync({
+        compress: 0.8,
+        format: SaveFormat.PNG,
+      });
+      const data = await fetch(imagemRedimensionada.uri);
+      const blob = await data.blob();
+
+      //2. Prepara o path onde ela deve ser salva no storage
+      const storageReference = ref(storage, `imagens/usuarios/${uid}/foto.png`);
+
+      //3. Envia para o storage
+      await uploadBytes(storageReference, blob);
+
+      //4. Retorna a URL da imagem
+      const url = await getDownloadURL(storageReference);
+      return url;
+    } catch (e) {
+      console.error(e);
+      return null;
     }
   }
 

@@ -1,5 +1,6 @@
 import { AuthContext } from '@/context/AuthProvider';
 import { yupResolver } from '@hookform/resolvers/yup';
+import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { useContext, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -55,13 +56,50 @@ export default function SignUpScreen() {
   const [requisitando, setRequisitando] = useState(false);
   const [dialogVisivel, setDialogVisivel] = useState(false);
   const [mensagem, setMensagem] = useState({ tipo: '', mensagem: '' });
+  const [urlFotoDevice, setUrlFotoDevice] = useState('');
+
+  async function escolherDaGaleria() {
+    const permissao = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissao.granted) {
+      Alert.alert('Precisamos de permissão para acessar a galeria.');
+      return;
+    }
+    const resultado = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+    if (!resultado.canceled) {
+      setUrlFotoDevice(resultado.assets[0].uri);
+    }
+  }
+
+  async function tirarFoto() {
+    const permissao = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permissao.granted) {
+      Alert.alert('Precisamos de permissão para acessar a câmera.');
+      return;
+    }
+    const resultado = await ImagePicker.launchCameraAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+    if (!resultado.canceled) {
+      setUrlFotoDevice(resultado.assets[0].uri);
+    }
+  }
 
   async function cadastrar(data: Usuario) {
     setRequisitando(true);
-    data.urlFoto = 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50';
+    if (!urlFotoDevice) {
+      data.urlFoto = 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50';
+    }
     data.curso = Curso.CSTSI;
     data.perfil = Perfil.Aluno;
-    const msg = await signUp(data);
+    const msg = await signUp(data, urlFotoDevice);
     if (msg === 'ok') {
       setMensagem({
         tipo: 'ok',
@@ -80,22 +118,17 @@ export default function SignUpScreen() {
     <SafeAreaView style={{ ...styles.container, backgroundColor: theme.colors.background }}>
       <ScrollView>
         <>
-          <Image style={styles.image} source={require('../../assets/images/icon.png')} />
+          <Image
+            style={styles.image}
+            source={
+              urlFotoDevice ? { uri: urlFotoDevice } : require('../../assets/images/icon.png')
+            }
+          />
           <View style={styles.divButtonsImage}>
-            <Button
-              style={styles.buttonImage}
-              mode="outlined"
-              icon="image"
-              onPress={() => Alert.alert('Vamos ver isso em upload de imagens')}
-            >
+            <Button style={styles.buttonImage} mode="outlined" icon="image" onPress={escolherDaGaleria}>
               Galeria
             </Button>
-            <Button
-              style={styles.buttonImage}
-              mode="outlined"
-              icon="camera"
-              onPress={() => Alert.alert('Vamos ver isso em upload de imagens')}
-            >
+            <Button style={styles.buttonImage} mode="outlined" icon="camera" onPress={tirarFoto}>
               Foto
             </Button>
           </View>
