@@ -49,17 +49,13 @@ export const UserProvider = ({ children }: any) => {
         }
         usuario.urlFoto = urlStorage;
       }
-      await setDoc(
-        doc(firestore, 'usuarios', usuario.uid),
-        {
-          email: usuario.email,
-          nome: usuario.nome,
-          idioma: usuario.idioma,
-          tema: usuario.tema,
-          urlFoto: usuario.urlFoto,
-        },
-        { merge: true },
-      );
+      await setDoc(doc(firestore, 'usuarios', usuario.uid), {
+        email: usuario.email,
+        nome: usuario.nome,
+        idioma: usuario.idioma,
+        tema: usuario.tema,
+        urlFoto: usuario.urlFoto,
+      });
       setUserFirebase(usuario);
       return 'ok';
     } catch (e) {
@@ -71,10 +67,7 @@ export const UserProvider = ({ children }: any) => {
   async function del(uid: string): Promise<string> {
     try {
       await deleteDoc(doc(firestore, 'usuarios', uid));
-      const msg = await delAccount();
-      if (msg !== 'ok') {
-        return msg;
-      }
+      await delAccount();
       return 'ok';
     } catch (e) {
       console.error(e);

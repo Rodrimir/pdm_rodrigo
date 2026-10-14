@@ -18,10 +18,10 @@ const schema = yup
   .object()
   .shape({
     nome: yup.string().required(requiredMessage).min(2, 'O nome deve ter ao menos 2 caracteres'),
-    email: yup.string().matches(/\S+@\S+\.\S+/, {
-      message: 'Email inválido',
-      excludeEmptyString: true,
-    }),
+    email: yup
+      .string()
+      .required(requiredMessage)
+      .matches(/\S+@\S+\.\S+/, 'Email inválido'),
     idioma: yup.string().required(requiredMessage),
     tema: yup.string().required(requiredMessage),
   })
@@ -36,19 +36,11 @@ export default function Perfil() {
     formState: { errors },
   } = useForm<any>({
     defaultValues: {
-      nome: '',
-      email: '',
-      idioma: Idioma.ptBR,
-      tema: Tema.Claro,
+      nome: usuerFirebase.nome,
+      email: usuerFirebase.email,
+      idioma: usuerFirebase.idioma,
+      tema: usuerFirebase.tema,
     },
-    values: usuerFirebase
-      ? {
-          nome: usuerFirebase.nome ?? '',
-          email: usuerFirebase.email ?? '',
-          idioma: Object.values(Idioma).includes(usuerFirebase.idioma) ? usuerFirebase.idioma : Idioma.ptBR,
-          tema: Object.values(Tema).includes(usuerFirebase.tema) ? usuerFirebase.tema : Tema.Claro,
-        }
-      : undefined,
     mode: 'onSubmit',
     resolver: yupResolver(schema),
   });
@@ -62,13 +54,10 @@ export default function Perfil() {
   const { update, del } = useContext(UserContext);
 
   async function atualizaPerfil(data: Usuario) {
-    if (!usuerFirebase) {
-      return;
-    }
     setRequisitando(true);
     setAtualizando(true);
     data.uid = usuerFirebase.uid;
-    data.urlFoto = usuerFirebase.urlFoto ?? '';
+    data.urlFoto = usuerFirebase.urlFoto;
     const msg = await update(data, urlFotoDevice);
     if (msg === 'ok') {
       setMensagem({
@@ -125,9 +114,6 @@ export default function Perfil() {
   }
 
   async function excluirConta() {
-    if (!usuerFirebase) {
-      return;
-    }
     setDialogExcluirVisivel(false);
     setRequisitando(true);
     setExcluindo(true);
@@ -146,7 +132,7 @@ export default function Perfil() {
     <SafeAreaView style={{ ...styles.container, backgroundColor: theme.colors.background }}>
       <ScrollView>
         <>
-          {urlFotoDevice || usuerFirebase?.urlFoto ? (
+          {urlFotoDevice || usuerFirebase.urlFoto ? (
             <Image style={styles.image} source={{ uri: urlFotoDevice || usuerFirebase.urlFoto }} />
           ) : (
             <Avatar.Icon style={styles.image} size={200} icon="account" />
@@ -178,7 +164,7 @@ export default function Perfil() {
             )}
             name="nome"
           />
-          {errors.nome && (
+          {errors.email && (
             <Text style={{ ...styles.textError, color: theme.colors.error }}>
               {errors.nome?.message?.toString()}
             </Text>
@@ -268,7 +254,7 @@ export default function Perfil() {
           <Button
             style={styles.buttonOthers}
             mode="outlined"
-            onPress={avisarDaExclusaoPermanenteDaConta}
+            onPress={handleSubmit(avisarDaExclusaoPermanenteDaConta)}
             loading={requisitando}
             disabled={requisitando}
           >
@@ -279,7 +265,7 @@ export default function Perfil() {
       <Dialog
         visible={dialogExcluirVisivel}
         onDismiss={() => {
-          setDialogExcluirVisivel(false);
+          setDialogErroVisivel(false);
         }}
       >
         <Dialog.Icon icon={'alert-circle-outline'} size={60} />

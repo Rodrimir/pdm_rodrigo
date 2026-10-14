@@ -3,7 +3,7 @@ import { Credencial } from '@/model/types';
 import { Usuario } from '@/model/Usuario';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import * as SecureStore from 'expo-secure-store';
-import { createUserWithEmailAndPassword, deleteUser, sendEmailVerification, sendPasswordResetEmail, signInWithEmailAndPassword, signOut, UserCredential } from 'firebase/auth';
+import { createUserWithEmailAndPassword, deleteUser, sendEmailVerification, signInWithEmailAndPassword, signOut, UserCredential } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { createContext, useState } from 'react';
@@ -60,9 +60,7 @@ export const AuthProvider = ({ children }: any) => {
           idioma: usuario.idioma,
           tema: usuario.tema,
         };
-        await setDoc(doc(firestore, 'usuarios', userCredential.user.uid), usuarioFirestore, {
-          merge: true,
-        });
+        await setDoc(doc(firestore, 'usuarios', userCredential.user.uid), usuarioFirestore);
       } else {
         return 'Confira se você digitou o email e a senha.';
       }
@@ -98,29 +96,9 @@ export const AuthProvider = ({ children }: any) => {
     }
   }
 
-  async function recuperarSenha(email: string): Promise<string> {
-    try {
-      await sendPasswordResetEmail(auth, email);
-      return 'ok';
-    } catch (error: any) {
-      console.error(error.code, error.message);
-      return launchServerMessageErro(error);
-    }
-  }
-
-  async function delAccount(): Promise<string> {
-    try {
-      if (!userAuth?.user) {
-        return 'Nenhum usuário autenticado. Entre novamente e tente de novo.';
-      }
+  async function delAccount(): Promise<void> {
+    if (userAuth?.user) {
       await deleteUser(userAuth.user);
-      return 'ok';
-    } catch (e: any) {
-      console.error(e.code, e.message);
-      if (e.code === 'auth/requires-recent-login') {
-        return 'Por segurança, entre novamente no app antes de excluir sua conta.';
-      }
-      return launchServerMessageErro(e);
     }
   }
 
@@ -138,8 +116,6 @@ export const AuthProvider = ({ children }: any) => {
         return 'Usuário desabilitado.';
       case 'auth/email-already-in-use':
         return 'Email em uso. Tente outro email.';
-      case 'auth/too-many-requests':
-        return 'Muitas tentativas. Tente novamente mais tarde.';
       default:
         return 'Erro desconhecido. Contate o administrador';
     }
@@ -174,7 +150,6 @@ export const AuthProvider = ({ children }: any) => {
       value={{
         signIn,
         sair,
-        recuperarSenha,
         recuperaCredencialdaCache,
         signUp,
         userAuth,
