@@ -1,12 +1,15 @@
 import { UserContext } from '@/context/UserProvider';
 import { yupResolver } from '@hookform/resolvers/yup';
+import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Image, ScrollView, StyleSheet, View } from 'react-native';
-import { Button, Dialog, Text, TextInput, useTheme } from 'react-native-paper';
+import { Alert, Image, ScrollView, StyleSheet, View } from 'react-native';
+import { Avatar, Button, Dialog, SegmentedButtons, Text, TextInput, useTheme } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as yup from 'yup';
+import { Idioma } from '../model/Idioma';
+import { Tema } from '../model/Tema';
 import { Usuario } from '../model/Usuario';
 
 const requiredMessage = 'Campo obrigatório';
@@ -15,16 +18,16 @@ const schema = yup
   .object()
   .shape({
     nome: yup.string().required(requiredMessage).min(2, 'O nome deve ter ao menos 2 caracteres'),
-    email: yup
-      .string()
-      .required(requiredMessage)
-      .matches(/\S+@\S+\.\S+/, 'Email inválido'),
-    curso: yup.string().required(requiredMessage),
-    perfil: yup.string().required(requiredMessage),
+    email: yup.string().matches(/\S+@\S+\.\S+/, {
+      message: 'Email inválido',
+      excludeEmptyString: true,
+    }),
+    idioma: yup.string().required(requiredMessage),
+    tema: yup.string().required(requiredMessage),
   })
   .required();
 
-export default function Perfil({ navigation }: any) {
+export default function Perfil() {
   const theme = useTheme();
   const { usuerFirebase } = useContext<any>(UserContext);
   const {
@@ -33,11 +36,19 @@ export default function Perfil({ navigation }: any) {
     formState: { errors },
   } = useForm<any>({
     defaultValues: {
-      nome: usuerFirebase.nome,
-      email: usuerFirebase.email,
-      curso: usuerFirebase.curso,
-      perfil: usuerFirebase.perfil,
+      nome: '',
+      email: '',
+      idioma: Idioma.ptBR,
+      tema: Tema.Claro,
     },
+    values: usuerFirebase
+      ? {
+          nome: usuerFirebase.nome ?? '',
+          email: usuerFirebase.email ?? '',
+          idioma: Object.values(Idioma).includes(usuerFirebase.idioma) ? usuerFirebase.idioma : Idioma.ptBR,
+          tema: Object.values(Tema).includes(usuerFirebase.tema) ? usuerFirebase.tema : Tema.Claro,
+        }
+      : undefined,
     mode: 'onSubmit',
     resolver: yupResolver(schema),
   });
@@ -47,15 +58,18 @@ export default function Perfil({ navigation }: any) {
   const [dialogErroVisivel, setDialogErroVisivel] = useState(false);
   const [dialogExcluirVisivel, setDialogExcluirVisivel] = useState(false);
   const [mensagem, setMensagem] = useState({ tipo: '', mensagem: '' });
+  const [urlFotoDevice, setUrlFotoDevice] = useState('');
   const { update, del } = useContext(UserContext);
 
-  useEffect(() => {}, []);
-
   async function atualizaPerfil(data: Usuario) {
+    if (!usuerFirebase) {
+      return;
+    }
     setRequisitando(true);
     setAtualizando(true);
     data.uid = usuerFirebase.uid;
-    const msg = await update(data);
+    data.urlFoto = usuerFirebase.urlFoto ?? '';
+    const msg = await update(data, urlFotoDevice);
     if (msg === 'ok') {
       setMensagem({
         tipo: 'ok',
@@ -72,11 +86,48 @@ export default function Perfil({ navigation }: any) {
     }
   }
 
+  async function escolherDaGaleria() {
+    const permissao = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissao.granted) {
+      Alert.alert('Precisamos de permissão para acessar a galeria.');
+      return;
+    }
+    const resultado = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+    if (!resultado.canceled) {
+      setUrlFotoDevice(resultado.assets[0].uri);
+    }
+  }
+
+  async function tirarFoto() {
+    const permissao = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permissao.granted) {
+      Alert.alert('Precisamos de permissão para acessar a câmera.');
+      return;
+    }
+    const resultado = await ImagePicker.launchCameraAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+    if (!resultado.canceled) {
+      setUrlFotoDevice(resultado.assets[0].uri);
+    }
+  }
+
   function avisarDaExclusaoPermanenteDaConta() {
     setDialogExcluirVisivel(true);
   }
 
   async function excluirConta() {
+    if (!usuerFirebase) {
+      return;
+    }
     setDialogExcluirVisivel(false);
     setRequisitando(true);
     setExcluindo(true);
@@ -84,7 +135,7 @@ export default function Perfil({ navigation }: any) {
     if (msg === 'ok') {
       router.replace('/entrar');
     } else {
-      setMensagem({ tipo: 'erro', mensagem: 'ops! algo deu errado' });
+      setMensagem({ tipo: 'erro', mensagem: msg });
       setDialogErroVisivel(true);
       setRequisitando(false);
       setExcluindo(false);
@@ -95,23 +146,16 @@ export default function Perfil({ navigation }: any) {
     <SafeAreaView style={{ ...styles.container, backgroundColor: theme.colors.background }}>
       <ScrollView>
         <>
-          <Image
-            source={require('../../assets/images/icon.png')}
-            loadingIndicatorSource={require('../../assets/images/icon.png')}
-          />
-          <View>
-            <Button
-              mode="outlined"
-              icon="image"
-              onPress={() => alert('Isso será desenvolvido na branch modulo2_upload_imagen))')}
-            >
+          {urlFotoDevice || usuerFirebase?.urlFoto ? (
+            <Image style={styles.image} source={{ uri: urlFotoDevice || usuerFirebase.urlFoto }} />
+          ) : (
+            <Avatar.Icon style={styles.image} size={200} icon="account" />
+          )}
+          <View style={styles.divButtonsImage}>
+            <Button style={styles.buttonImage} mode="outlined" icon="image" onPress={escolherDaGaleria}>
               Galeria
             </Button>
-            <Button
-              mode="outlined"
-              icon="camera"
-              onPress={() => alert('Isso será desenvolvido na branch modulo2_upload_imagen))')}
-            >
+            <Button style={styles.buttonImage} mode="outlined" icon="camera" onPress={tirarFoto}>
               Foto
             </Button>
           </View>
@@ -134,7 +178,7 @@ export default function Perfil({ navigation }: any) {
             )}
             name="nome"
           />
-          {errors.email && (
+          {errors.nome && (
             <Text style={{ ...styles.textError, color: theme.colors.error }}>
               {errors.nome?.message?.toString()}
             </Text>
@@ -166,52 +210,50 @@ export default function Perfil({ navigation }: any) {
             </Text>
           )}
 
+          <Text style={styles.label} variant="labelLarge">
+            Idioma
+          </Text>
           <Controller
             control={control}
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                style={styles.textinput}
-                disabled
-                label="Curso ou Empresa"
-                placeholder="Clique para selecionar outro curso"
-                mode="outlined"
-                autoCapitalize="none"
-                returnKeyType="next"
-                onBlur={onBlur}
-                onChangeText={onChange}
+            render={({ field: { onChange, value } }) => (
+              <SegmentedButtons
+                style={styles.segmented}
+                onValueChange={onChange}
                 value={value}
-                right={<TextInput.Icon icon="domain" />}
+                buttons={[
+                  { value: Idioma.ptBR, label: Idioma.ptBR, icon: 'translate' },
+                  { value: Idioma.enUS, label: Idioma.enUS, icon: 'translate' },
+                ]}
               />
             )}
-            name="curso"
+            name="idioma"
           />
-          {errors.curso && (
+          {errors.idioma && (
             <Text style={{ ...styles.textError, color: theme.colors.error }}>
-              {errors.senha?.message?.toString()}
+              {errors.idioma?.message?.toString()}
             </Text>
           )}
+          <Text style={styles.label} variant="labelLarge">
+            Tema
+          </Text>
           <Controller
             control={control}
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                style={styles.textinput}
-                disabled
-                label="Perfil"
-                placeholder="Clique para selecionar outro perfil"
-                mode="outlined"
-                autoCapitalize="none"
-                returnKeyType="go"
-                onBlur={onBlur}
-                onChangeText={onChange}
+            render={({ field: { onChange, value } }) => (
+              <SegmentedButtons
+                style={styles.segmented}
+                onValueChange={onChange}
                 value={value}
-                right={<TextInput.Icon icon="account-eye" />}
+                buttons={[
+                  { value: Tema.Claro, label: Tema.Claro, icon: 'white-balance-sunny' },
+                  { value: Tema.Escuro, label: Tema.Escuro, icon: 'weather-night' },
+                ]}
               />
             )}
-            name="perfil"
+            name="tema"
           />
-          {errors.perfil && (
+          {errors.tema && (
             <Text style={{ ...styles.textError, color: theme.colors.error }}>
-              {errors.perfil?.message?.toString()}
+              {errors.tema?.message?.toString()}
             </Text>
           )}
           <Button
@@ -226,7 +268,7 @@ export default function Perfil({ navigation }: any) {
           <Button
             style={styles.buttonOthers}
             mode="outlined"
-            onPress={handleSubmit(avisarDaExclusaoPermanenteDaConta)}
+            onPress={avisarDaExclusaoPermanenteDaConta}
             loading={requisitando}
             disabled={requisitando}
           >
@@ -237,7 +279,7 @@ export default function Perfil({ navigation }: any) {
       <Dialog
         visible={dialogExcluirVisivel}
         onDismiss={() => {
-          setDialogErroVisivel(false);
+          setDialogExcluirVisivel(false);
         }}
       >
         <Dialog.Icon icon={'alert-circle-outline'} size={60} />
@@ -282,6 +324,30 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
+  },
+  image: {
+    width: 200,
+    height: 200,
+    alignSelf: 'center',
+    borderRadius: 200 / 2,
+    marginTop: 50,
+  },
+  divButtonsImage: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 15,
+    marginBottom: 20,
+  },
+  buttonImage: {
+    width: 180,
+  },
+  label: {
+    width: 350,
+    marginTop: 20,
+    marginBottom: 6,
+  },
+  segmented: {
+    width: 350,
   },
   textinput: {
     width: 350,

@@ -7,13 +7,12 @@ import { useTheme } from 'react-native-paper';
 
 export default function PreloadScreen() {
   const theme = useTheme();
-  const { recuperaCredencialdaCache, entrar } = useContext<any>(AuthContext);
+  const { recuperaCredencialdaCache, signIn } = useContext<any>(AuthContext);
 
   async function logar() {
     const credencial = await recuperaCredencialdaCache();
-    if (credencial !== 'null') {
-      //se tem credenciais armazenadas tenta logar
-      const mensagem = await entrar(credencial);
+    if (credencial) {
+      const mensagem = await signIn(credencial);
       if (mensagem === 'ok') {
         router.replace('/(tabs)/home');
       } else {

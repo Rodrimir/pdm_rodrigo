@@ -3,14 +3,7 @@ import { Credencial } from '@/model/types';
 import { Usuario } from '@/model/Usuario';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import * as SecureStore from 'expo-secure-store';
-import {
-  createUserWithEmailAndPassword,
-  deleteUser,
-  sendEmailVerification,
-  signInWithEmailAndPassword,
-  signOut,
-  UserCredential,
-} from 'firebase/auth';
+import { createUserWithEmailAndPassword, deleteUser, sendEmailVerification, sendPasswordResetEmail, signInWithEmailAndPassword, signOut, UserCredential } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { createContext, useState } from 'react';
@@ -19,9 +12,7 @@ export const AuthContext = createContext<any>({});
 
 export const AuthProvider = ({ children }: any) => {
   const [userAuth, setUserAuth] = useState<UserCredential | null>(null);
-  /*
-    Cache criptografado do usuário
-  */
+
   async function armazenaCredencialnaCache(credencial: Credencial): Promise<void> {
     try {
       await SecureStore.setItemAsync(
@@ -36,7 +27,7 @@ export const AuthProvider = ({ children }: any) => {
     }
   }
 
-  async function recuperaCredencialdaCache(): Promise<null | string> {
+  async function recuperaCredencialdaCache(): Promise<Credencial | null> {
     try {
       const credencial = await SecureStore.getItemAsync('credencial');
       return credencial ? JSON.parse(credencial) : null;
@@ -47,17 +38,10 @@ export const AuthProvider = ({ children }: any) => {
     }
   }
 
-  /*
-    Funções do processo de Autenticação
-  */
   async function signUp(usuario: Usuario, urlDevice?: string): Promise<string> {
     try {
       if (usuario.email && usuario.senha) {
-        const userCredential = await createUserWithEmailAndPassword(
-          auth,
-          usuario.email,
-          usuario.senha,
-        );
+        const userCredential = await createUserWithEmailAndPassword(auth, usuario.email, usuario.senha);
         if (userCredential) {
           await sendEmailVerification(userCredential.user);
           if (urlDevice) {
@@ -68,15 +52,17 @@ export const AuthProvider = ({ children }: any) => {
             usuario.urlFoto = urlStorage;
           }
         }
-        //A senha não deve ser persistida no serviço Firetore, ela é gerida pelo serviço Authentication
+
         const usuarioFirestore = {
           email: usuario.email,
           nome: usuario.nome,
           urlFoto: usuario.urlFoto,
-          curso: usuario.curso,
-          perfil: usuario.perfil,
+          idioma: usuario.idioma,
+          tema: usuario.tema,
         };
-        await setDoc(doc(firestore, 'usuarios', userCredential.user.uid), usuarioFirestore);
+        await setDoc(doc(firestore, 'usuarios', userCredential.user.uid), usuarioFirestore, {
+          merge: true,
+        });
       } else {
         return 'Confira se você digitou o email e a senha.';
       }
@@ -87,13 +73,9 @@ export const AuthProvider = ({ children }: any) => {
     }
   }
 
-  async function entrar(credencial: Credencial): Promise<string> {
+  async function signIn(credencial: Credencial): Promise<string> {
     try {
-      const userCredencial = await signInWithEmailAndPassword(
-        auth,
-        credencial.email,
-        credencial.senha,
-      );
+      const userCredencial = await signInWithEmailAndPassword(auth, credencial.email, credencial.senha);
       if (!userCredencial.user.emailVerified) {
         return 'Você precisa verificar seu email para continuar.';
       }
@@ -101,6 +83,7 @@ export const AuthProvider = ({ children }: any) => {
       armazenaCredencialnaCache(credencial);
       return 'ok';
     } catch (error: any) {
+      console.error(error.code, error.message);
       return launchServerMessageErro(error);
     }
   }
@@ -115,13 +98,32 @@ export const AuthProvider = ({ children }: any) => {
     }
   }
 
-  async function delAccount(): Promise<void> {
-    if (userAuth?.user) {
-      await deleteUser(userAuth.user);
+  async function recuperarSenha(email: string): Promise<string> {
+    try {
+      await sendPasswordResetEmail(auth, email);
+      return 'ok';
+    } catch (error: any) {
+      console.error(error.code, error.message);
+      return launchServerMessageErro(error);
     }
   }
 
-  //função utilitária
+  async function delAccount(): Promise<string> {
+    try {
+      if (!userAuth?.user) {
+        return 'Nenhum usuário autenticado. Entre novamente e tente de novo.';
+      }
+      await deleteUser(userAuth.user);
+      return 'ok';
+    } catch (e: any) {
+      console.error(e.code, e.message);
+      if (e.code === 'auth/requires-recent-login') {
+        return 'Por segurança, entre novamente no app antes de excluir sua conta.';
+      }
+      return launchServerMessageErro(e);
+    }
+  }
+
   function launchServerMessageErro(e: any): string {
     switch (e.code) {
       case 'auth/invalid-credential':
@@ -136,16 +138,15 @@ export const AuthProvider = ({ children }: any) => {
         return 'Usuário desabilitado.';
       case 'auth/email-already-in-use':
         return 'Email em uso. Tente outro email.';
+      case 'auth/too-many-requests':
+        return 'Muitas tentativas. Tente novamente mais tarde.';
       default:
         return 'Erro desconhecido. Contate o administrador';
     }
   }
 
-  //Função utilitária para envio de imagens para o serviço de Storage
-  //urlDevice: qual imagem que está no device que deve ser enviada via upload
   async function sendImageToStorage(urlDevice: string, uid: string): Promise<string | null> {
     try {
-      //1. Redimensiona, compacta a imagem, e a transforma em blob
       const contexto = ImageManipulator.manipulate(urlDevice);
       contexto.resize({ width: 150, height: 150 });
       const imagemManipulada = await contexto.renderAsync();
@@ -156,13 +157,10 @@ export const AuthProvider = ({ children }: any) => {
       const data = await fetch(imagemRedimensionada.uri);
       const blob = await data.blob();
 
-      //2. Prepara o path onde ela deve ser salva no storage
       const storageReference = ref(storage, `imagens/usuarios/${uid}/foto.png`);
 
-      //3. Envia para o storage
       await uploadBytes(storageReference, blob);
 
-      //4. Retorna a URL da imagem
       const url = await getDownloadURL(storageReference);
       return url;
     } catch (e) {
@@ -174,13 +172,14 @@ export const AuthProvider = ({ children }: any) => {
   return (
     <AuthContext.Provider
       value={{
-        entrar,
+        signIn,
         sair,
+        recuperarSenha,
         recuperaCredencialdaCache,
         signUp,
         userAuth,
         delAccount,
-        AuthProvider,
+        sendImageToStorage,
       }}
     >
       {children}

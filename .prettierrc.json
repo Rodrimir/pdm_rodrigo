@@ -2,6 +2,12 @@
   "semi": true,
   "singleQuote": true,
   "trailingComma": "all",
-  "printWidth": 100,
-  "tabWidth": 2
+  "printWidth": 110,
+  "tabWidth": 2,
+  "overrides": [
+    {
+      "files": "src/context/AuthProvider.tsx",
+      "options": { "printWidth": 180 }
+    }
+  ]
 }

@@ -1,29 +1,29 @@
-import { Curso } from './Curso';
-import { Perfil } from './Perfil';
+import { Idioma } from './Idioma';
+import { Tema } from './Tema';
 
 export class Usuario {
   public uid: string;
   public email: string;
   public nome: string;
   public urlFoto: string;
-  public curso: Curso;
-  public perfil: Perfil;
+  public idioma: Idioma;
+  public tema: Tema;
   public senha?: string;
   constructor(
     uid: string,
     email: string,
     nome: string,
     urlFoto: string,
-    curso: Curso,
-    perfil: Perfil,
+    idioma: Idioma,
+    tema: Tema,
     senha?: string,
   ) {
     this.uid = uid;
     this.email = email;
     this.nome = nome;
     this.urlFoto = urlFoto;
-    this.curso = curso;
-    this.perfil = perfil;
+    this.idioma = idioma;
+    this.tema = tema;
     this.senha = senha;
   }
 }

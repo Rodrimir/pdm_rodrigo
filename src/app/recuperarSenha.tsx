@@ -10,8 +10,6 @@ import * as yup from 'yup';
 
 const requiredMessage = 'Campo obrigatório';
 
-// Schema do Yup usado pelo React Hook Form para validar o formulario
-// antes de qualquer chamada ao Firebase.
 const schema = yup
   .object()
   .shape({
@@ -22,8 +20,6 @@ const schema = yup
   })
   .required();
 
-// Tela de recuperacao de senha: recebe o email do usuario para que o Firebase
-// envie o link de redefinicao.
 export default function RecuperarSenhaScreen() {
   const theme = useTheme();
   const { recuperarSenha } = useContext<any>(AuthContext);
@@ -42,8 +38,6 @@ export default function RecuperarSenhaScreen() {
     resolver: yupResolver(schema),
   });
 
-  // Pede o envio do email de redefinicao e, em caso de sucesso, volta para a tela
-  // de login depois que o usuario fecha o Dialog.
   async function enviarEmailDeRecuperacao(data: { email: string }) {
     setEnviando(true);
     const resposta = await recuperarSenha(data.email);
@@ -59,7 +53,6 @@ export default function RecuperarSenhaScreen() {
     setDialogVisivel(true);
   }
 
-  // Formulario montado com componentes do React Native Paper e Controller do Hook Form.
   return (
     <SafeAreaView style={{ ...styles.container, backgroundColor: theme.colors.background }}>
       <ScrollView>
@@ -132,7 +125,6 @@ export default function RecuperarSenhaScreen() {
   );
 }
 
-// Estilos da tela.
 const styles = StyleSheet.create({
   container: {
     flex: 1,

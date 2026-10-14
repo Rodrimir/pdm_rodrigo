@@ -7,12 +7,13 @@ import { Controller, useForm } from 'react-hook-form';
 import { Alert, Image, SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import { Button, Dialog, Text, TextInput, useTheme } from 'react-native-paper';
 import * as yup from 'yup';
-import { Curso } from '../model/Curso';
-import { Perfil } from '../model/Perfil';
+import { Idioma } from '../model/Idioma';
+import { Tema } from '../model/Tema';
 import { Usuario } from '../model/Usuario';
 
 const requiredMessage = 'Campo obrigatório';
 
+//Validação com o Yup de cada campo do formulário de cadastro
 const schema = yup
   .object()
   .shape({
@@ -97,8 +98,8 @@ export default function SignUpScreen() {
     if (!urlFotoDevice) {
       data.urlFoto = 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50';
     }
-    data.curso = Curso.CSTSI;
-    data.perfil = Perfil.Aluno;
+    data.idioma = Idioma.ptBR;
+    data.tema = Tema.Claro;
     const msg = await signUp(data, urlFotoDevice);
     if (msg === 'ok') {
       setMensagem({
@@ -120,9 +121,7 @@ export default function SignUpScreen() {
         <>
           <Image
             style={styles.image}
-            source={
-              urlFotoDevice ? { uri: urlFotoDevice } : require('../../assets/images/icon.png')
-            }
+            source={urlFotoDevice ? { uri: urlFotoDevice } : require('../../assets/images/icon.png')}
           />
           <View style={styles.divButtonsImage}>
             <Button style={styles.buttonImage} mode="outlined" icon="image" onPress={escolherDaGaleria}>
@@ -196,12 +195,7 @@ export default function SignUpScreen() {
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
-                right={
-                  <TextInput.Icon
-                    icon="eye"
-                    onPress={() => setExibirSenha((previus) => !previus)}
-                  />
-                }
+                right={<TextInput.Icon icon="eye" onPress={() => setExibirSenha((previus) => !previus)} />}
               />
             )}
             name="senha"
@@ -225,12 +219,7 @@ export default function SignUpScreen() {
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
-                right={
-                  <TextInput.Icon
-                    icon="eye"
-                    onPress={() => setExibirSenha((previus) => !previus)}
-                  />
-                }
+                right={<TextInput.Icon icon="eye" onPress={() => setExibirSenha((previus) => !previus)} />}
               />
             )}
             name="confirmar_senha"

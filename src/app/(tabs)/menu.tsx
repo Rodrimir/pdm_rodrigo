@@ -4,13 +4,11 @@ import { useContext, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Dialog, Divider, List, Text, useTheme } from 'react-native-paper';
 
-// Aba de Menu: da acesso ao perfil do usuario e permite sair do app.
 export default function Menu() {
   const theme = useTheme();
   const { sair } = useContext<any>(AuthContext);
   const [dialogVisivel, setDialogVisivel] = useState(false);
 
-  // SignOut: encerra a sessao e manda o usuario de volta para a tela de login.
   async function handleSair() {
     const confirmacao = await sair();
     if (confirmacao === 'ok') {
@@ -20,7 +18,6 @@ export default function Menu() {
     }
   }
 
-  // Lista de opcoes montada com o componente List do React Native Paper.
   return (
     <View style={{ ...styles.container, backgroundColor: theme.colors.background }}>
       <List.Item
@@ -62,7 +59,6 @@ export default function Menu() {
   );
 }
 
-// Estilos da tela.
 const styles = StyleSheet.create({
   container: {
     flex: 1,

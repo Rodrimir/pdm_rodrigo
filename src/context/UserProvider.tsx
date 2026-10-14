@@ -8,10 +8,9 @@ import { AuthContext } from './AuthProvider';
 export const UserContext = createContext<any>({});
 
 export const UserProvider = ({ children }: any) => {
-  const { userAuth, delAccount } = useContext(AuthContext);
+  const { userAuth, delAccount, sendImageToStorage } = useContext(AuthContext);
   const [usuerFirebase, setUserFirebase] = useState<Usuario | null>(null);
 
-  //busca os detalhes do usuário
   async function getUser(): Promise<void> {
     try {
       if (!userAuth.user) {
@@ -25,8 +24,8 @@ export const UserProvider = ({ children }: any) => {
           email: userData.email,
           nome: userData.nome,
           urlFoto: userData.urlFoto,
-          curso: userData.curso,
-          perfil: userData.perfil,
+          idioma: userData.idioma,
+          tema: userData.tema,
         };
         setUserFirebase(usuario);
       }
@@ -41,15 +40,26 @@ export const UserProvider = ({ children }: any) => {
     }
   }, [userAuth]);
 
-  async function update(usuario: Usuario): Promise<string> {
+  async function update(usuario: Usuario, urlDevice?: string): Promise<string> {
     try {
-      await setDoc(doc(firestore, 'usuarios', usuario.uid), {
-        curso: usuario.curso,
-        email: usuario.email,
-        nome: usuario.nome,
-        perfil: usuario.perfil,
-        urlFoto: usuario.urlFoto,
-      });
+      if (urlDevice) {
+        const urlStorage = await sendImageToStorage(urlDevice, usuario.uid);
+        if (!urlStorage) {
+          return 'Erro ao enviar a imagem. Contate o suporte.';
+        }
+        usuario.urlFoto = urlStorage;
+      }
+      await setDoc(
+        doc(firestore, 'usuarios', usuario.uid),
+        {
+          email: usuario.email,
+          nome: usuario.nome,
+          idioma: usuario.idioma,
+          tema: usuario.tema,
+          urlFoto: usuario.urlFoto,
+        },
+        { merge: true },
+      );
       setUserFirebase(usuario);
       return 'ok';
     } catch (e) {
@@ -61,7 +71,10 @@ export const UserProvider = ({ children }: any) => {
   async function del(uid: string): Promise<string> {
     try {
       await deleteDoc(doc(firestore, 'usuarios', uid));
-      await delAccount();
+      const msg = await delAccount();
+      if (msg !== 'ok') {
+        return msg;
+      }
       return 'ok';
     } catch (e) {
       console.error(e);
@@ -69,7 +82,5 @@ export const UserProvider = ({ children }: any) => {
     }
   }
 
-  return (
-    <UserContext.Provider value={{ usuerFirebase, update, del }}>{children}</UserContext.Provider>
-  );
+  return <UserContext.Provider value={{ usuerFirebase, update, del }}>{children}</UserContext.Provider>;
 };
