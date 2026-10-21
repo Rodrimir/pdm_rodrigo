@@ -95,9 +95,6 @@ export default function SignUpScreen() {
 
   async function cadastrar(data: Usuario) {
     setRequisitando(true);
-    if (!urlFotoDevice) {
-      data.urlFoto = 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50';
-    }
     data.idioma = Idioma.ptBR;
     data.tema = Tema.Claro;
     const msg = await signUp(data, urlFotoDevice);

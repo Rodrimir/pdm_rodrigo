@@ -59,6 +59,7 @@ export const AuthProvider = ({ children }: any) => {
           urlFoto: usuario.urlFoto,
           idioma: usuario.idioma,
           tema: usuario.tema,
+          fuso: usuario.fuso,
         };
         await setDoc(doc(firestore, 'usuarios', userCredential.user.uid), usuarioFirestore);
       } else {

@@ -4,13 +4,14 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { useColorScheme } from 'react-native';
 import { MD3DarkTheme, MD3LightTheme, PaperProvider } from 'react-native-paper';
 import 'react-native-reanimated';
 
 // Segura a splash
 SplashScreen.preventAutoHideAsync();
 
-//Criar variaveis de tema clato e escito
+//Criar variaveis de tema clato e escuro
 const themeLight = {
   ...MD3LightTheme,
 };
@@ -19,16 +20,15 @@ const themeDark = {
   ...MD3DarkTheme,
 };
 
-const temaDoApp = true;
-
-// Layout raiz do app
 export default function RootLayout() {
+  const colorScheme = useColorScheme();
+
   useEffect(() => {
     SplashScreen.hideAsync();
   }, []);
 
   return (
-    <PaperProvider theme={temaDoApp ? themeLight : themeDark}>
+    <PaperProvider theme={colorScheme === 'dark' ? themeDark : themeLight}>
       <AuthProvider>
         <UserProvider>
           <StatusBar style="dark" />

@@ -8,6 +8,7 @@ import { Alert, Image, ScrollView, StyleSheet, View } from 'react-native';
 import { Avatar, Button, Dialog, SegmentedButtons, Text, TextInput, useTheme } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as yup from 'yup';
+import { Fuso } from '../model/Fuso';
 import { Idioma } from '../model/Idioma';
 import { Tema } from '../model/Tema';
 import { Usuario } from '../model/Usuario';
@@ -24,6 +25,7 @@ const schema = yup
       .matches(/\S+@\S+\.\S+/, 'Email inválido'),
     idioma: yup.string().required(requiredMessage),
     tema: yup.string().required(requiredMessage),
+    fuso: yup.string().required(requiredMessage),
   })
   .required();
 
@@ -40,6 +42,7 @@ export default function Perfil() {
       email: usuerFirebase.email,
       idioma: usuerFirebase.idioma,
       tema: usuerFirebase.tema,
+      fuso: usuerFirebase.fuso,
     },
     mode: 'onSubmit',
     resolver: yupResolver(schema),
@@ -240,6 +243,30 @@ export default function Perfil() {
           {errors.tema && (
             <Text style={{ ...styles.textError, color: theme.colors.error }}>
               {errors.tema?.message?.toString()}
+            </Text>
+          )}
+          <Text style={styles.label} variant="labelLarge">
+            Fuso horário
+          </Text>
+          <Controller
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <SegmentedButtons
+                style={styles.segmented}
+                onValueChange={onChange}
+                value={value}
+                buttons={[
+                  { value: Fuso.brasilia, label: Fuso.brasilia },
+                  { value: Fuso.manaus, label: Fuso.manaus },
+                  { value: Fuso.acre, label: Fuso.acre },
+                ]}
+              />
+            )}
+            name="fuso"
+          />
+          {errors.fuso && (
+            <Text style={{ ...styles.textError, color: theme.colors.error }}>
+              {errors.fuso?.message?.toString()}
             </Text>
           )}
           <Button

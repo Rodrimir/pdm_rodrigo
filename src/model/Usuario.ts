@@ -1,3 +1,4 @@
+import { Fuso } from './Fuso';
 import { Idioma } from './Idioma';
 import { Tema } from './Tema';
 
@@ -8,6 +9,7 @@ export class Usuario {
   public urlFoto: string;
   public idioma: Idioma;
   public tema: Tema;
+  public fuso: Fuso;
   public senha?: string;
   constructor(
     uid: string,
@@ -16,6 +18,7 @@ export class Usuario {
     urlFoto: string,
     idioma: Idioma,
     tema: Tema,
+    fuso: Fuso,
     senha?: string,
   ) {
     this.uid = uid;
@@ -24,6 +27,7 @@ export class Usuario {
     this.urlFoto = urlFoto;
     this.idioma = idioma;
     this.tema = tema;
+    this.fuso = fuso;
     this.senha = senha;
   }
 }

@@ -26,6 +26,7 @@ export const UserProvider = ({ children }: any) => {
           urlFoto: userData.urlFoto,
           idioma: userData.idioma,
           tema: userData.tema,
+          fuso: userData.fuso,
         };
         setUserFirebase(usuario);
       }
@@ -54,6 +55,7 @@ export const UserProvider = ({ children }: any) => {
         nome: usuario.nome,
         idioma: usuario.idioma,
         tema: usuario.tema,
+        fuso: usuario.fuso,
         urlFoto: usuario.urlFoto,
       });
       setUserFirebase(usuario);
