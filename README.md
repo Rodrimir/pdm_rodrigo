@@ -1,102 +1,62 @@
-# Welcome to your Expo app 👋
+# pdm_rodrigo
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Aplicativo mobile desenvolvido na disciplina de **Programação de Dispositivos Móveis** (PDM) do curso
+de Tecnologia em Sistemas para Internet, IFSul Câmpus Pelotas, sob orientação do **Prof. Gill Velleda
+Gonzales**.
 
-## Get started
+**Autor:** Rodrigo Miranda da Silva ([@Rodrimir](https://github.com/Rodrimir)).
 
-1. Install dependencies
+## O que o aplicativo faz
 
-   ```bash
-   npm install
-   ```
+É um app de conta de usuário completo, construído com Expo e React Native:
 
-2. Start the app
+- **Autenticação** com Firebase: cadastro, entrada, recuperação de senha e sessão persistente.
+- **Perfil do usuário** com foto, editável pela câmera ou pela galeria do aparelho.
+- **Preferências** de tema, idioma e fuso horário, guardadas por usuário.
+- **Navegação em abas** com Expo Router, separando a área autenticada da área pública.
+- **Notificações** e armazenamento seguro de credenciais no dispositivo.
 
-   ```bash
-   npx expo start
-   ```
+## Stack
 
-In the output, you'll find options to open the app in a
+| Camada | Tecnologia |
+|---|---|
+| Framework | Expo (SDK 58) com React Native |
+| Linguagem | TypeScript |
+| Navegação | Expo Router |
+| Autenticação e dados | Firebase |
+| Formulários | React Hook Form com validação por schema |
+| Build e distribuição | EAS Build (APK, AAB e dev client) |
+| Interface | Expo UI, Expo Symbols e Expo Image |
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Estrutura
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+O código fica em `src`:
 
-## Get a fresh project
+- `app` — as telas e o roteamento. Entrar, cadastrar, recuperar senha, perfil e as abas internas.
+- `context` — provedores de estado global: `AuthProvider` para a sessão e `UserProvider` para os dados do usuário.
+- `firebase` — configuração e inicialização do SDK.
+- `model` — tipos do domínio: usuário, tema, idioma e fuso.
+- `services` — integrações externas, como a consulta de localização.
 
-When you're ready, run:
+## Executar localmente
 
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-### Other setup steps
-
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
-
-## Verificando versões do ambiente
-
-Comandos úteis pra conferir o que está instalado (Node, nvm, Expo, dependências do
-projeto, ferramentas de qualidade e Git).
-
-### Node.js e nvm
+Requer Node.js 20 ou superior e um aparelho ou emulador Android.
 
 ```bash
-node -v                    # versão do Node.js ativa nesta sessão do terminal
-npm -v                     # versão do npm ativa
-nvm current                # versão do Node que o nvm está usando agora
-nvm ls                     # lista as versões do Node já instaladas via nvm
-nvm ls-remote --lts         # lista as versões LTS disponíveis pra instalar
-nvm alias default           # mostra qual versão é a padrão do nvm (usada em novos terminais)
+npm install
+npx expo start
 ```
 
-### Projeto Expo / React Native / TypeScript
+Para rodar no dev client ou gerar um instalador, use o EAS:
 
 ```bash
-npx expo --version                 # versão do Expo CLI
-npx expo config                    # mostra a configuração final do app (app.json + defaults)
-npx expo-doctor                    # verifica se as dependências estão compatíveis com a SDK do projeto
-npx expo install --check           # lista pacotes cuja versão não bate com a esperada pela SDK
-cat package.json | grep '"expo"'   # versão da SDK do Expo travada neste projeto
-npm list --depth=0                 # versão de todas as dependências diretas instaladas
-npm outdated                       # mostra quais dependências têm versão mais nova disponível
-npx tsc --version                  # versão do TypeScript
+npm install --global eas-cli
+eas build --profile development --platform android
 ```
 
-### ESLint e Prettier
+O arquivo `google-services.json` do Firebase é necessário para a autenticação funcionar e não
+acompanha o repositório público; crie um projeto no Firebase e baixe o seu.
 
-```bash
-npx eslint --version       # versão do ESLint
-npx prettier --version     # versão do Prettier
-npm run lint                # roda o ESLint no projeto (expo lint)
-npm run format               # formata o projeto inteiro com o Prettier
-```
+## Licença
 
-### Git
-
-```bash
-git --version                      # versão do Git instalada
-git config --global --list         # identidade configurada (user.name / user.email) e outras opções globais
-git log --oneline                  # histórico de commits deste repositório
-```
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+MIT. Veja [LICENSE](LICENSE).
