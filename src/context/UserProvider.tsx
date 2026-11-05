@@ -17,6 +17,7 @@ export const UserProvider = ({ children }: any) => {
         return;
       }
       const docSnap = await getDoc(doc(firestore, 'usuarios', userAuth.user.uid));
+      console.log('docSnap.data(): ', docSnap.data());
       if (docSnap.exists()) {
         let userData = docSnap.data();
         const usuario: Usuario = {
@@ -28,6 +29,7 @@ export const UserProvider = ({ children }: any) => {
           tema: userData.tema,
           fuso: userData.fuso,
         };
+        console.log('usuario: ', usuario);
         setUserFirebase(usuario);
       }
     } catch (e) {

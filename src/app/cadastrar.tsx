@@ -1,4 +1,5 @@
 import { AuthContext } from '@/context/AuthProvider';
+import { Fuso } from '@/model/Fuso';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
@@ -97,6 +98,8 @@ export default function SignUpScreen() {
     setRequisitando(true);
     data.idioma = Idioma.ptBR;
     data.tema = Tema.Claro;
+    data.fuso = Fuso.brasilia;
+    data.urlFoto = '';
     const msg = await signUp(data, urlFotoDevice);
     if (msg === 'ok') {
       setMensagem({
@@ -229,7 +232,7 @@ export default function SignUpScreen() {
           <Button
             style={styles.button}
             mode="contained"
-            onPress={handleSubmit(cadastrar)}
+            onPress={() => handleSubmit(cadastrar)()}
             loading={requisitando}
             disabled={requisitando}
           >

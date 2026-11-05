@@ -13,23 +13,23 @@ import { Idioma } from '../model/Idioma';
 import { Tema } from '../model/Tema';
 import { Usuario } from '../model/Usuario';
 
-const requiredMessage = 'Campo obrigatório';
+const MensagemAlerta = 'Campo obrigatório';
 
 const schema = yup
   .object()
   .shape({
-    nome: yup.string().required(requiredMessage).min(2, 'O nome deve ter ao menos 2 caracteres'),
+    nome: yup.string().required(MensagemAlerta).min(2, 'O nome deve ter ao menos 2 caracteres'),
     email: yup
       .string()
-      .required(requiredMessage)
+      .required(MensagemAlerta)
       .matches(/\S+@\S+\.\S+/, 'Email inválido'),
-    idioma: yup.string().required(requiredMessage),
-    tema: yup.string().required(requiredMessage),
-    fuso: yup.string().required(requiredMessage),
+    idioma: yup.string().required(MensagemAlerta),
+    tema: yup.string().required(MensagemAlerta),
+    fuso: yup.string().required(MensagemAlerta),
   })
   .required();
 
-export default function Perfil() {
+export default function Perfil({ navigation }: any) {
   const theme = useTheme();
   const { usuerFirebase } = useContext<any>(UserContext);
   const {
@@ -39,7 +39,7 @@ export default function Perfil() {
   } = useForm<any>({
     defaultValues: {
       nome: usuerFirebase.nome,
-      email: usuerFirebase.email,
+      email: usuerFirebase?.email,
       idioma: usuerFirebase.idioma,
       tema: usuerFirebase.tema,
       fuso: usuerFirebase.fuso,
@@ -55,6 +55,7 @@ export default function Perfil() {
   const [mensagem, setMensagem] = useState({ tipo: '', mensagem: '' });
   const [urlFotoDevice, setUrlFotoDevice] = useState('');
   const { update, del } = useContext(UserContext);
+  console.log('usuerFirebase: ', usuerFirebase);
 
   async function atualizaPerfil(data: Usuario) {
     setRequisitando(true);
@@ -272,7 +273,7 @@ export default function Perfil() {
           <Button
             style={styles.button}
             mode="contained"
-            onPress={handleSubmit(atualizaPerfil)}
+            onPress={() => handleSubmit(atualizaPerfil)()}
             loading={requisitando}
             disabled={requisitando}
           >
@@ -281,7 +282,7 @@ export default function Perfil() {
           <Button
             style={styles.buttonOthers}
             mode="outlined"
-            onPress={handleSubmit(avisarDaExclusaoPermanenteDaConta)}
+            onPress={() => handleSubmit(avisarDaExclusaoPermanenteDaConta)()}
             loading={requisitando}
             disabled={requisitando}
           >

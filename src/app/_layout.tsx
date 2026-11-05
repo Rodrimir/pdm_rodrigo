@@ -14,10 +14,22 @@ SplashScreen.preventAutoHideAsync();
 //Criar variaveis de tema clato e escuro
 const themeLight = {
   ...MD3LightTheme,
+  colors: {
+    ...MD3LightTheme.colors,
+    primary: '#6200ee',
+    white: '#fff',
+    black: '#000',
+  },
 };
 
 const themeDark = {
   ...MD3DarkTheme,
+  colors: {
+    ...MD3DarkTheme.colors,
+    primary: '#bb86fc',
+    white: '#fff',
+    black: '#000',
+  },
 };
 
 export default function RootLayout() {
@@ -33,7 +45,6 @@ export default function RootLayout() {
         <UserProvider>
           <StatusBar style="dark" />
           <Stack
-            initialRouteName="index"
             screenOptions={{
               headerShown: false,
             }}

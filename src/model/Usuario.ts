@@ -3,23 +3,15 @@ import { Idioma } from './Idioma';
 import { Tema } from './Tema';
 
 export class Usuario {
-  public uid: string;
-  public email: string;
-  public nome: string;
-  public urlFoto: string;
-  public idioma: Idioma;
-  public tema: Tema;
-  public fuso: Fuso;
-  public senha?: string;
   constructor(
-    uid: string,
-    email: string,
-    nome: string,
-    urlFoto: string,
-    idioma: Idioma,
-    tema: Tema,
-    fuso: Fuso,
-    senha?: string,
+    public uid: string,
+    public email: string,
+    public nome: string,
+    public urlFoto: string,
+    public idioma: Idioma,
+    public tema: Tema,
+    public fuso: Fuso,
+    public senha?: string,
   ) {
     this.uid = uid;
     this.email = email;

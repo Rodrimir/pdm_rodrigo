@@ -5,7 +5,7 @@ import { router } from 'expo-router';
 import { useContext, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Image, ScrollView, StyleSheet, View } from 'react-native';
-import { Button, Dialog, Divider, Text, TextInput, useTheme } from 'react-native-paper';
+import { Button, Dialog, Divider, MD3DarkTheme, MD3LightTheme, Text, TextInput, useTheme } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as yup from 'yup';
 
@@ -19,7 +19,7 @@ const schema = yup
       .required(requiredMessage)
       .matches(/\S+@\S+\.\S+/, 'Email inválido'),
     senha: yup
-      .string()   
+      .string()
       .required(requiredMessage)
       .matches(
         /^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[$*&@#])[0-9a-zA-Z$*&@#]{8,}$/,
@@ -27,6 +27,27 @@ const schema = yup
       ),
   })
   .required();
+
+  //aplicando o tema pradrão
+const themeLight = {
+  ...MD3LightTheme,
+  colors: {
+    ...MD3LightTheme.colors,
+    primary: '#6200ee',
+    white: '#fff',
+    black: '#000',
+  },
+};
+
+const themeDark = {
+  ...MD3DarkTheme,
+  colors: {
+    ...MD3DarkTheme.colors,
+    primary: '#bb86fc',
+    white: '#fff',
+    black: '#000',
+  },
+};
 
 export default function Entrar() {
   const theme = useTheme();
@@ -136,7 +157,7 @@ export default function Entrar() {
           <Button
             style={styles.button}
             mode="contained"
-            onPress={handleSubmit(entrar)}
+            onPress={() => handleSubmit(entrar)()}
             loading={logando}
             disabled={logando}
           >

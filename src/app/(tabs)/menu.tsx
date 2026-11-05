@@ -34,7 +34,7 @@ export default function Menu() {
         title="Alterar Senha"
         description="Altere sua senha"
         left={() => <List.Icon color={theme.colors.primary} icon="eye-arrow-right-outline" />}
-        onPress={() => alert('em desenvolvimento')}
+        onPress={() => alert('criar pagina ..')}
       />
       <Divider />
       <List.Item
