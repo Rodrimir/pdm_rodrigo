@@ -15,7 +15,6 @@ import { Usuario } from '../model/Usuario';
 
 const MensagemAlerta = 'Campo obrigatório';
 
-// Validação com o Yup de cada campo do formulário de perfil
 const schema = yup
   .object()
   .shape({
@@ -30,11 +29,9 @@ const schema = yup
   })
   .required();
 
-// Tela de perfil: atualiza os dados e a foto ou exclui a conta
 export default function Perfil({ navigation }: any) {
   const theme = useTheme();
   const { usuerFirebase } = useContext<any>(UserContext);
-  // Formulário preenchido com os dados atuais do usuário
   const {
     control,
     handleSubmit,
@@ -56,12 +53,10 @@ export default function Perfil({ navigation }: any) {
   const [dialogErroVisivel, setDialogErroVisivel] = useState(false);
   const [dialogExcluirVisivel, setDialogExcluirVisivel] = useState(false);
   const [mensagem, setMensagem] = useState({ tipo: '', mensagem: '' });
-  // Foto escolhida no celular, ainda não enviada
   const [urlFotoDevice, setUrlFotoDevice] = useState('');
   const { atualizarUsuarioNoFirestore, excluirContaEDadosDoUsuario } = useContext(UserContext);
   console.log('usuerFirebase: ', usuerFirebase);
 
-  // Envia o perfil e a foto nova, e mostra o resultado
   async function atualizarPerfilDoUsuario(data: Usuario) {
     setRequisitando(true);
     setAtualizando(true);
@@ -84,7 +79,6 @@ export default function Perfil({ navigation }: any) {
     }
   }
 
-  // Pede permissão e abre a galeria para escolher a foto
   async function escolherFotoDaGaleria() {
     const permissao = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permissao.granted) {
@@ -102,7 +96,6 @@ export default function Perfil({ navigation }: any) {
     }
   }
 
-  // Pede permissão e abre a câmera para tirar a foto
   async function tirarFotoComCamera() {
     const permissao = await ImagePicker.requestCameraPermissionsAsync();
     if (!permissao.granted) {
@@ -120,12 +113,10 @@ export default function Perfil({ navigation }: any) {
     }
   }
 
-  // Abre a confirmação antes de excluir a conta
   function avisarDaExclusaoPermanenteDaConta() {
     setDialogExcluirVisivel(true);
   }
 
-  // Exclui a conta e todos os dados, e volta para a tela de entrar
   async function excluirContaDoUsuario() {
     setDialogExcluirVisivel(false);
     setRequisitando(true);
@@ -145,13 +136,11 @@ export default function Perfil({ navigation }: any) {
     <SafeAreaView style={{ ...styles.container, backgroundColor: theme.colors.background }}>
       <ScrollView>
         <>
-          {/* Foto do usuário ou ícone padrão */}
           {urlFotoDevice || usuerFirebase?.urlFoto ? (
             <Image style={styles.image} source={{ uri: urlFotoDevice || usuerFirebase?.urlFoto }} />
           ) : (
             <Avatar.Icon style={styles.image} size={200} icon="account" />
           )}
-          {/* Botões para escolher a foto */}
           <View style={styles.divButtonsImage}>
             <Button style={styles.buttonImage} mode="outlined" icon="image" onPress={escolherFotoDaGaleria}>
               Galeria
@@ -161,7 +150,6 @@ export default function Perfil({ navigation }: any) {
             </Button>
           </View>
 
-          {/* Campo de nome */}
           <Controller
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
@@ -186,7 +174,6 @@ export default function Perfil({ navigation }: any) {
             </Text>
           )}
 
-          {/* Campo de email (não pode ser alterado) */}
           <Controller
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
@@ -216,7 +203,6 @@ export default function Perfil({ navigation }: any) {
           <Text style={styles.label} variant="labelLarge">
             Idioma
           </Text>
-          {/* Escolha do idioma */}
           <Controller
             control={control}
             render={({ field: { onChange, value } }) => (
@@ -240,7 +226,6 @@ export default function Perfil({ navigation }: any) {
           <Text style={styles.label} variant="labelLarge">
             Tema
           </Text>
-          {/* Escolha do tema */}
           <Controller
             control={control}
             render={({ field: { onChange, value } }) => (
@@ -264,7 +249,6 @@ export default function Perfil({ navigation }: any) {
           <Text style={styles.label} variant="labelLarge">
             Fuso horário
           </Text>
-          {/* Escolha do fuso horário */}
           <Controller
             control={control}
             render={({ field: { onChange, value } }) => (
@@ -286,7 +270,6 @@ export default function Perfil({ navigation }: any) {
               {errors.fuso?.message?.toString()}
             </Text>
           )}
-          {/* Botão de atualizar */}
           <Button
             style={styles.button}
             mode="contained"
@@ -296,7 +279,6 @@ export default function Perfil({ navigation }: any) {
           >
             {!atualizando ? 'Atualizar' : 'Atualizando'}
           </Button>
-          {/* Botão de excluir a conta */}
           <Button
             style={styles.buttonOthers}
             mode="outlined"
@@ -308,7 +290,6 @@ export default function Perfil({ navigation }: any) {
           </Button>
         </>
       </ScrollView>
-      {/* Confirmação da exclusão */}
       <Dialog
         visible={dialogExcluirVisivel}
         onDismiss={() => {
@@ -327,7 +308,6 @@ export default function Perfil({ navigation }: any) {
           <Button onPress={excluirContaDoUsuario}>Excluir</Button>
         </Dialog.Actions>
       </Dialog>
-      {/* Resultado da operação */}
       <Dialog
         visible={dialogErroVisivel}
         onDismiss={() => {
@@ -354,7 +334,6 @@ export default function Perfil({ navigation }: any) {
   );
 }
 
-// Estilos da tela de perfil
 const styles = StyleSheet.create({
   container: {
     flex: 1,

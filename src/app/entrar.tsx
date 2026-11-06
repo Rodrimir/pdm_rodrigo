@@ -11,7 +11,6 @@ import * as yup from 'yup';
 
 const requiredMessage = 'Campo obrigatório';
 
-// Validação com o Yup de cada campo do formulário de login
 const schema = yup
   .object()
   .shape({
@@ -29,16 +28,13 @@ const schema = yup
   })
   .required();
 
-// Tela de login
 export default function Entrar() {
   const theme = useTheme();
   const { signInComEmailESenha } = useContext(AuthContext);
-  // Controla se a senha fica escondida
   const [exibirSenha, setExibirSenha] = useState(true);
   const [logando, setLogando] = useState(false);
   const [dialogVisivel, setDialogVisivel] = useState(false);
   const [mensagemDialog, setMensagemDialog] = useState('');
-  // Formulário com React Hook Form e validação do Yup
   const {
     control,
     handleSubmit,
@@ -52,7 +48,6 @@ export default function Entrar() {
     resolver: yupResolver(schema),
   });
 
-  // Faz o login e vai para a Home; se falhar, mostra o erro
   async function entrarComEmailESenha(data: Credencial) {
     setLogando(true);
     const response = await signInComEmailESenha(data);
@@ -70,8 +65,7 @@ export default function Entrar() {
     <SafeAreaView style={{ ...styles.container, backgroundColor: theme.colors.background }}>
       <ScrollView>
         <>
-          <Image style={styles.image} source={require('../assets/images/icon.png')} />
-          {/* Campo de email */}
+          <Image style={styles.image} source={require('../../assets/images/icon.png')} />
           <Controller
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
@@ -96,7 +90,6 @@ export default function Entrar() {
               {errors.email?.message?.toString()}
             </Text>
           )}
-          {/* Campo de senha */}
           <Controller
             control={control}
             rules={{
@@ -130,7 +123,6 @@ export default function Entrar() {
               {errors.senha?.message?.toString()}
             </Text>
           )}
-          {/* Link para recuperar a senha */}
           <Text
             style={{
               ...styles.textEsqueceuSenha,
@@ -141,7 +133,6 @@ export default function Entrar() {
           >
             Esqueceu sua senha?
           </Text>
-          {/* Botão de login */}
           <Button
             style={styles.button}
             mode="contained"
@@ -152,7 +143,6 @@ export default function Entrar() {
             {!logando ? 'Entrar' : 'Entrando'}
           </Button>
           <Divider />
-          {/* Link para o cadastro */}
           <View style={styles.divCadastro}>
             <Text variant="labelMedium">Não tem uma conta?</Text>
             <Text
@@ -166,7 +156,6 @@ export default function Entrar() {
           </View>
         </>
       </ScrollView>
-      {/* Aviso de erro no login */}
       <Dialog visible={dialogVisivel} onDismiss={() => setDialogVisivel(false)}>
         <Dialog.Icon icon="alert-circle-outline" size={60} />
         <Dialog.Title style={styles.textDialog}>Erro</Dialog.Title>
@@ -180,7 +169,6 @@ export default function Entrar() {
   );
 }
 
-// Estilos da tela de login
 const styles = StyleSheet.create({
   container: {
     flex: 1,

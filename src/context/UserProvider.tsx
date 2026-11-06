@@ -1,13 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps, react-hooks/set-state-in-effect, react-hooks/immutability */
-import { firestore } from '@/firebase/firebaseInit';
-import { Usuario } from '@/model/Usuario';
 import { collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, where } from 'firebase/firestore';
 import { createContext, useContext, useEffect, useState } from 'react';
+import { firestore } from '../firebase/firebaseInit';
+import { Usuario } from '../model/Usuario';
 import { AuthContext } from './AuthProvider';
 
 export const UserContext = createContext<any>({});
 
-// Provider do perfil: lê, atualiza e exclui os dados do usuário no Firestore
 export const UserProvider = ({ children }: any) => {
   const {
     userAuth,
@@ -15,10 +14,8 @@ export const UserProvider = ({ children }: any) => {
     excluirContaDoAuthentication,
     enviarImagemDoUsuarioParaStorage,
   } = useContext<any>(AuthContext);
-  // Guarda os dados do perfil do usuário logado
   const [usuerFirebase, setUserFirebase] = useState<Usuario | null>(null);
 
-  // Quando alguém entra, busca o perfil; quando sai, limpa os dados
   useEffect(() => {
     if (userAuth) {
       getUsuarioDoFirestore();
@@ -27,7 +24,6 @@ export const UserProvider = ({ children }: any) => {
     }
   }, [userAuth]);
 
-  // Busca o documento do usuário logado e guarda no estado
   async function getUsuarioDoFirestore(): Promise<void> {
     try {
       if (!userAuth.user) {
@@ -54,7 +50,6 @@ export const UserProvider = ({ children }: any) => {
     }
   }
 
-  // Atualiza o perfil no Firestore; se houver foto nova, envia para o Storage antes
   async function atualizarUsuarioNoFirestore(usuario: Usuario, urlDevice?: string): Promise<string> {
     try {
       if (urlDevice) {
@@ -64,7 +59,6 @@ export const UserProvider = ({ children }: any) => {
         }
         usuario.urlFoto = urlStorage;
       }
-      // O merge mantém o campo token_fcm, senão atualizar o perfil apagaria o token
       await setDoc(
         doc(firestore, 'usuarios', usuario.uid),
         {
@@ -85,10 +79,8 @@ export const UserProvider = ({ children }: any) => {
     }
   }
 
-  // Exclui as execuções, o hábito, o perfil e, por último, a conta do Authentication
   async function excluirContaEDadosDoUsuario(uid: string): Promise<string> {
     try {
-      // Antes de apagar qualquer coisa: o deleteUser exige login recente
       await reautenticarUsuarioComCredencialDaCache();
       const execucoes = await getDocs(
         query(collection(firestore, 'execucoes'), where('uidUsuario', '==', uid)),

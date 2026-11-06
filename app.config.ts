@@ -20,7 +20,6 @@ const config: ExpoConfig = {
     },
     predictiveBackGestureEnabled: false,
     package: 'com.rodrigo.pdm_rodrigo',
-    // Liga o app ao Firebase: no EAS vem da variável de ambiente e, localmente, do arquivo
     googleServicesFile: process.env.GOOGLE_SERVICES_JSON ?? './google-services.json',
   },
   web: {
@@ -46,8 +45,7 @@ const config: ExpoConfig = {
     ],
     'expo-secure-store',
     'expo-image',
-    // Notificações: as mensagens do FCM usam o canal default criado no Preload
-    ['expo-notifications', { defaultChannel: 'default' }],
+    ['expo-notifications', { defaultChannel: 'padrao', color: '#208AEF' }],
   ],
   experiments: {
     typedRoutes: true,

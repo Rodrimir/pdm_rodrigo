@@ -2,7 +2,6 @@ import { Fuso } from './Fuso';
 import { Idioma } from './Idioma';
 import { Tema } from './Tema';
 
-// Modelo do usuário: a senha só é usada no cadastro e nunca é salva no Firestore
 export class Usuario {
   constructor(
     public uid: string,

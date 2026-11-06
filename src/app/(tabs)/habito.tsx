@@ -21,12 +21,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as yup from 'yup';
 
-// Mensagem padrão dos campos obrigatórios
 const MensagemAlerta = 'Campo obrigatório';
-// Opção do histórico que mostra as execuções de todos os avatares
 const FiltroTodos = 'Todos';
 
-// Validação com o Yup do formulário do hábito
 const schemaHabito = yup
   .object()
   .shape({
@@ -39,7 +36,6 @@ const schemaHabito = yup
   })
   .required();
 
-// Validação com o Yup do formulário da execução: aceita só números inteiros a partir de 1
 const schemaExecucao = yup
   .object()
   .shape({
@@ -52,20 +48,17 @@ const schemaExecucao = yup
   })
   .required();
 
-// Mantém só os dígitos e coloca os dois pontos: 0830 vira 08:30
 function formatarHorarioDigitado(texto: string): string {
   const digitos = texto.replace(/\D/g, '').slice(0, 4);
   return digitos.length > 2 ? `${digitos.slice(0, 2)}:${digitos.slice(2)}` : digitos;
 }
 
-// Mostra o dia e a hora em que a execução foi feita
 function formatarDataHoraDaExecucao(data: Date): string {
   const dia = data.toLocaleDateString('pt-BR');
   const hora = data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   return `${dia} às ${hora}`;
 }
 
-// Aba Hábito: cria, atualiza e exclui o hábito, registra execuções e mostra o histórico
 export default function HabitoScreen() {
   const theme = useTheme();
   const {
@@ -76,7 +69,6 @@ export default function HabitoScreen() {
     adicionarExecucaoDoHabitoNoFirestore,
     getExecucoesDoUsuarioPeloAvatar,
   } = useContext<any>(HabitoContext);
-  // Formulário do hábito, preenchido com o hábito atual quando ele existe
   const {
     control,
     handleSubmit,
@@ -87,7 +79,6 @@ export default function HabitoScreen() {
     mode: 'onSubmit',
     resolver: yupResolver(schemaHabito),
   });
-  // Formulário da execução
   const {
     control: controlExecucao,
     handleSubmit: handleSubmitExecucao,
@@ -102,16 +93,11 @@ export default function HabitoScreen() {
   const [dialogMensagemVisivel, setDialogMensagemVisivel] = useState(false);
   const [dialogExcluirVisivel, setDialogExcluirVisivel] = useState(false);
   const [mensagem, setMensagem] = useState({ tipo: '', mensagem: '' });
-  // Avatar escolhido no filtro do histórico
   const [filtro, setFiltro] = useState<string>(FiltroTodos);
-  // Execuções mostradas no histórico
   const [execucoesFiltradas, setExecucoesFiltradas] = useState<Execucao[]>([]);
-  // Soma das quantidades mostradas no histórico
   const totalExecucoes = execucoesFiltradas.reduce((total, execucao) => total + execucao.quantidade, 0);
 
-  // Atualiza o histórico quando o filtro muda ou quando chega uma execução nova
   useEffect(() => {
-    // Ignora a resposta antiga se o filtro mudar antes de ela chegar
     let ativo = true;
     if (filtro === FiltroTodos) {
       setExecucoesFiltradas(execucoes);
@@ -127,21 +113,18 @@ export default function HabitoScreen() {
     };
   }, [filtro, execucoes]);
 
-  // Mostra a mensagem de sucesso ou de erro e libera os botões
   function exibirResultadoDaOperacao(msg: string, mensagemSucesso: string) {
     setMensagem(msg === 'ok' ? { tipo: 'ok', mensagem: mensagemSucesso } : { tipo: 'erro', mensagem: msg });
     setDialogMensagemVisivel(true);
     setRequisitando(false);
   }
 
-  // Cria ou atualiza o hábito
   async function salvarHabito(data: Habito) {
     setRequisitando(true);
     const msg = await salvarHabitoNoFirestore(data);
     exibirResultadoDaOperacao(msg, habito ? 'Hábito atualizado com sucesso.' : 'Hábito criado com sucesso.');
   }
 
-  // Exclui o hábito depois da confirmação
   async function excluirHabito() {
     setDialogExcluirVisivel(false);
     setRequisitando(true);
@@ -149,7 +132,6 @@ export default function HabitoScreen() {
     exibirResultadoDaOperacao(msg, 'Hábito excluído. As execuções continuam salvas no histórico.');
   }
 
-  // Registra a execução para o avatar atual e limpa o campo
   async function registrarExecucaoDoHabito(data: { quantidade: number }) {
     setRequisitando(true);
     const msg = await adicionarExecucaoDoHabitoNoFirestore(habito.avatar, data.quantidade);
@@ -166,7 +148,6 @@ export default function HabitoScreen() {
           {habito ? 'Meu hábito' : 'Criar hábito'}
         </Text>
 
-        {/* Com hábito: mostra o avatar atual. Sem hábito: mostra os cards para escolher */}
         {habito ? (
           <Image
             style={styles.avatarAtual}
@@ -177,7 +158,6 @@ export default function HabitoScreen() {
         ) : (
           <>
             <Text variant="labelLarge">Escolha um avatar</Text>
-            {/* Cards dos avatares */}
             <Controller
               control={control}
               render={({ field: { onChange, value } }) => (
@@ -211,7 +191,6 @@ export default function HabitoScreen() {
           </>
         )}
 
-        {/* Campo do nome do hábito */}
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
@@ -231,7 +210,6 @@ export default function HabitoScreen() {
         />
         {errors.nome && <Text style={{ color: theme.colors.error }}>{errors.nome?.message?.toString()}</Text>}
 
-        {/* Campo do horário fixo do hábito */}
         <Controller
           control={control}
           render={({ field: { onChange, onBlur, value } }) => (
@@ -254,7 +232,6 @@ export default function HabitoScreen() {
           <Text style={{ color: theme.colors.error }}>{errors.horario?.message?.toString()}</Text>
         )}
 
-        {/* Botão de criar ou atualizar */}
         <Button
           style={styles.button}
           mode="contained"
@@ -265,7 +242,6 @@ export default function HabitoScreen() {
           {habito ? 'Atualizar' : 'Criar'}
         </Button>
 
-        {/* Excluir e registrar execução só aparecem quando existe um hábito */}
         {habito && (
           <>
             <Button
@@ -280,7 +256,6 @@ export default function HabitoScreen() {
             <Text style={styles.subtitulo} variant="titleMedium">
               Registrar execução
             </Text>
-            {/* Campo da quantidade da execução */}
             <Controller
               control={controlExecucao}
               render={({ field: { onChange, onBlur, value } }) => (
@@ -316,7 +291,6 @@ export default function HabitoScreen() {
           </>
         )}
 
-        {/* Histórico das execuções, com filtro por avatar */}
         {execucoes.length > 0 && (
           <>
             <Text style={styles.subtitulo} variant="titleMedium">
@@ -351,7 +325,6 @@ export default function HabitoScreen() {
         )}
       </ScrollView>
 
-      {/* Confirmação da exclusão */}
       <Dialog visible={dialogExcluirVisivel} onDismiss={() => setDialogExcluirVisivel(false)}>
         <Dialog.Icon icon={'alert-circle-outline'} size={60} />
         <Dialog.Title style={styles.textDialog}>{'Ops!'}</Dialog.Title>
@@ -365,7 +338,6 @@ export default function HabitoScreen() {
           <Button onPress={excluirHabito}>Excluir</Button>
         </Dialog.Actions>
       </Dialog>
-      {/* Resultado da operação */}
       <Dialog visible={dialogMensagemVisivel} onDismiss={() => setDialogMensagemVisivel(false)}>
         <Dialog.Icon
           icon={mensagem.tipo === 'ok' ? 'checkbox-marked-circle-outline' : 'alert-circle-outline'}
@@ -384,7 +356,6 @@ export default function HabitoScreen() {
   );
 }
 
-// Estilos da aba Hábito
 const styles = StyleSheet.create({
   container: {
     flex: 1,

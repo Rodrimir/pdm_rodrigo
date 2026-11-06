@@ -1,6 +1,5 @@
 import { AvatarHabito } from './AvatarHabito';
 
-// Modelo da execução: quantidade registrada para um avatar, em uma conta, com dia e hora
 export class Execucao {
   constructor(
     public uid: string,

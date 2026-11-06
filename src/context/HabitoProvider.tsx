@@ -21,7 +21,6 @@ import { AuthContext } from './AuthProvider';
 
 export const HabitoContext = createContext<any>({});
 
-// Converte os documentos do Firestore em execuções, com as mais recentes primeiro
 function converterDocumentosEmExecucoes(querySnapshot: QuerySnapshot): Execucao[] {
   const data: Execucao[] = [];
   querySnapshot.forEach((docSnap) => {
@@ -36,29 +35,24 @@ function converterDocumentosEmExecucoes(querySnapshot: QuerySnapshot): Execucao[
   return data.sort((a, b) => b.dataHora.getTime() - a.dataHora.getTime());
 }
 
-// Mantém o lembrete diário igual ao hábito: agenda, substitui ou cancela a notificação local
 async function atualizarNotificacaoDiariaDoHabito(habitoAtual: Habito | null | undefined): Promise<void> {
   try {
-    // Sem hábito (excluído ou usuário saiu): cancela o lembrete
     if (!habitoAtual) {
       await Notifications.cancelScheduledNotificationAsync('habito');
       return;
     }
 
-    // Transforma "08:30" em hora = 8 e minuto = 30
     const [hora, minuto] = habitoAtual.horario.split(':').map(Number);
 
     await Notifications.scheduleNotificationAsync({
-      // Id fixo: agendar de novo substitui o lembrete anterior
       identifier: 'habito',
       content: {
         title: `Hora de: ${habitoAtual.nome}`,
         body: 'Faça seu habito do tempo claro :)',
       },
-      // Repete todo dia, no horário escolhido, usando o canal criado no Preload
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.DAILY,
-        channelId: 'default',
+        channelId: 'padrao',
         hour: hora,
         minute: minuto,
       },
@@ -68,16 +62,12 @@ async function atualizarNotificacaoDiariaDoHabito(habitoAtual: Habito | null | u
   }
 }
 
-// Provider dos hábitos: CRUD do hábito e das execuções da conta logada
 export const HabitoProvider = ({ children }: any) => {
   const { userAuth } = useContext<any>(AuthContext);
-  // undefined: ainda carregando; null: o usuário não tem hábito
   const [habito, setHabito] = useState<Habito | null | undefined>(undefined);
-  // Todas as execuções da conta logada
   const [execucoes, setExecucoes] = useState<Execucao[]>([]);
   const uidUsuario: string | undefined = userAuth?.user?.uid;
 
-  // Escuta o hábito e as execuções em tempo real enquanto houver um usuário logado
   useEffect(() => {
     if (!uidUsuario) {
       setHabito(undefined);
@@ -85,7 +75,6 @@ export const HabitoProvider = ({ children }: any) => {
       return;
     }
 
-    // O id do documento é o uid do usuário, então cada conta tem um único hábito por vez
     const unsubscribeHabito = onSnapshot(
       doc(firestore, 'habitos', uidUsuario),
       (docSnap) => {
@@ -103,29 +92,26 @@ export const HabitoProvider = ({ children }: any) => {
       (e) => console.error('HabitoProvider, habito: ' + e),
     );
 
-    // Lista só as execuções da conta logada
     const unsubscribeExecucoes = onSnapshot(
       query(collection(firestore, 'execucoes'), where('uidUsuario', '==', uidUsuario)),
       (querySnapshot) => setExecucoes(converterDocumentosEmExecucoes(querySnapshot)),
       (e) => console.error('HabitoProvider, execucoes: ' + e),
     );
 
-    // Para de escutar quando o usuário muda ou sai
     return () => {
       unsubscribeHabito();
       unsubscribeExecucoes();
     };
   }, [uidUsuario]);
 
-  // Toda mudança no hábito atualiza o lembrete: criar, editar, excluir, entrar ou sair
   useEffect(() => {
     atualizarNotificacaoDiariaDoHabito(habito);
   }, [habito]);
 
-  // Create e Update: grava o hábito no documento com o uid do usuário
   async function salvarHabitoNoFirestore(novoHabito: Habito): Promise<string> {
+    if (!uidUsuario) return 'Usuário não autenticado.';
     try {
-      await setDoc(doc(firestore, 'habitos', uidUsuario as string), {
+      await setDoc(doc(firestore, 'habitos', uidUsuario), {
         avatar: novoHabito.avatar,
         nome: novoHabito.nome,
         horario: novoHabito.horario,
@@ -137,10 +123,10 @@ export const HabitoProvider = ({ children }: any) => {
     }
   }
 
-  // Delete: exclui o hábito; as execuções continuam no histórico
   async function excluirHabitoDoFirestore(): Promise<string> {
+    if (!uidUsuario) return 'Usuário não autenticado.';
     try {
-      await deleteDoc(doc(firestore, 'habitos', uidUsuario as string));
+      await deleteDoc(doc(firestore, 'habitos', uidUsuario));
       return 'ok';
     } catch (e) {
       console.error('HabitoProvider, excluirHabitoDoFirestore: ' + e);
@@ -148,11 +134,11 @@ export const HabitoProvider = ({ children }: any) => {
     }
   }
 
-  // Create: registra uma execução com a conta, o avatar, a quantidade, o dia e a hora
   async function adicionarExecucaoDoHabitoNoFirestore(
     avatar: AvatarHabito,
     quantidade: number,
   ): Promise<string> {
+    if (!uidUsuario) return 'Usuário não autenticado.';
     try {
       await addDoc(collection(firestore, 'execucoes'), {
         uidUsuario,
@@ -167,8 +153,8 @@ export const HabitoProvider = ({ children }: any) => {
     }
   }
 
-  // Read com filtro: busca as execuções da conta logada usando o avatar como chave de pesquisa
   async function getExecucoesDoUsuarioPeloAvatar(avatar: AvatarHabito): Promise<Execucao[]> {
+    if (!uidUsuario) return [];
     try {
       const q = query(
         collection(firestore, 'execucoes'),

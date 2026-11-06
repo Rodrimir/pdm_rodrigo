@@ -11,10 +11,8 @@ import { useColorScheme } from 'react-native';
 import { MD3DarkTheme, MD3LightTheme, PaperProvider } from 'react-native-paper';
 import 'react-native-reanimated';
 
-// Segura a splash até o app estar pronto
 SplashScreen.preventAutoHideAsync();
 
-// Tema claro do app
 const themeLight = {
   ...MD3LightTheme,
   colors: {
@@ -25,7 +23,6 @@ const themeLight = {
   },
 };
 
-// Tema escuro do app
 const themeDark = {
   ...MD3DarkTheme,
   colors: {
@@ -36,20 +33,16 @@ const themeDark = {
   },
 };
 
-// Fica dentro dos Providers porque o tema depende do perfil do usuário
 function AppComTema() {
   const colorScheme = useColorScheme();
   const { usuerFirebase } = useContext<any>(UserContext);
 
-  // Usa o tema do perfil; antes do login, segue o celular
   const escuro = usuerFirebase ? usuerFirebase.tema === Tema.Escuro : colorScheme === 'dark';
   const theme = escuro ? themeDark : themeLight;
 
   return (
-    // Entrega o tema para todos os componentes do Paper
     <PaperProvider theme={theme}>
       <StatusBar style={escuro ? 'light' : 'dark'} />
-      {/* Telas do app, sem o cabeçalho padrão */}
       <Stack
         screenOptions={{
           headerShown: false,
@@ -67,9 +60,7 @@ function AppComTema() {
   );
 }
 
-// Layout raiz: organiza os Providers e a navegação do app
 export default function RootLayout() {
-  // Esconde a splash quando o layout é montado
   useEffect(() => {
     SplashScreen.hideAsync();
   }, []);

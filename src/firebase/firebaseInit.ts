@@ -3,7 +3,6 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
-// Inicializa o Firebase com as chaves do arquivo .env (localmente) ou do EAS (no build)
 const app = initializeApp({
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -14,11 +13,8 @@ const app = initializeApp({
   measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
 });
 
-// Serviço de autenticação (login, cadastro, sair)
 export const auth = getAuth(app);
 
-// Banco de dados (usuarios, habitos, execucoes)
 export const firestore = getFirestore(app);
 
-// Armazenamento de arquivos (foto de perfil)
 export const storage = getStorage(app);

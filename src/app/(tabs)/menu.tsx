@@ -4,13 +4,11 @@ import { useContext, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Dialog, Divider, List, Text, useTheme } from 'react-native-paper';
 
-// Aba Menu: acesso ao perfil, à senha e à saída do app
 export default function Menu() {
   const theme = useTheme();
   const { signOutDaContaDoUsuario } = useContext<any>(AuthContext);
   const [dialogVisivel, setDialogVisivel] = useState(false);
 
-  // Sai da conta e volta para a tela de entrar; se falhar, mostra o aviso
   async function sairDoAplicativo() {
     const confirmacao = await signOutDaContaDoUsuario();
     if (confirmacao === 'ok') {
@@ -20,7 +18,6 @@ export default function Menu() {
     }
   }
 
-  // Lista de opções do menu
   return (
     <View style={{ ...styles.container, backgroundColor: theme.colors.background }}>
       <List.Item
@@ -62,7 +59,6 @@ export default function Menu() {
   );
 }
 
-// Estilos da tela Menu
 const styles = StyleSheet.create({
   container: {
     flex: 1,
