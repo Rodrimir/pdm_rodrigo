@@ -4,15 +4,15 @@ import { useContext, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Dialog, Divider, List, Text, useTheme } from 'react-native-paper';
 
-// Aba de Menu
+// Aba Menu: acesso ao perfil, à senha e à saída do app
 export default function Menu() {
   const theme = useTheme();
-  const { sair } = useContext<any>(AuthContext);
+  const { signOutDaContaDoUsuario } = useContext<any>(AuthContext);
   const [dialogVisivel, setDialogVisivel] = useState(false);
 
-  // SignOut
-  async function handleSair() {
-    const confirmacao = await sair();
+  // Sai da conta e volta para a tela de entrar; se falhar, mostra o aviso
+  async function sairDoAplicativo() {
+    const confirmacao = await signOutDaContaDoUsuario();
     if (confirmacao === 'ok') {
       router.replace('/entrar');
     } else {
@@ -20,7 +20,7 @@ export default function Menu() {
     }
   }
 
-  // Lista de opcoes
+  // Lista de opções do menu
   return (
     <View style={{ ...styles.container, backgroundColor: theme.colors.background }}>
       <List.Item
@@ -41,7 +41,7 @@ export default function Menu() {
         title="Sair"
         description="Finaliza sua sessão no aplicativo"
         left={() => <List.Icon color={theme.colors.primary} icon="exit-run" />}
-        onPress={handleSair}
+        onPress={sairDoAplicativo}
       />
       <Dialog
         visible={dialogVisivel}
@@ -62,7 +62,7 @@ export default function Menu() {
   );
 }
 
-// Estilo
+// Estilos da tela Menu
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -5,12 +5,13 @@ import { router } from 'expo-router';
 import { useContext, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Image, ScrollView, StyleSheet, View } from 'react-native';
-import { Button, Dialog, Divider, MD3DarkTheme, MD3LightTheme, Text, TextInput, useTheme } from 'react-native-paper';
+import { Button, Dialog, Divider, Text, TextInput, useTheme } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as yup from 'yup';
 
 const requiredMessage = 'Campo obrigatório';
 
+// Validação com o Yup de cada campo do formulário de login
 const schema = yup
   .object()
   .shape({
@@ -28,34 +29,16 @@ const schema = yup
   })
   .required();
 
-  //aplicando o tema pradrão
-const themeLight = {
-  ...MD3LightTheme,
-  colors: {
-    ...MD3LightTheme.colors,
-    primary: '#6200ee',
-    white: '#fff',
-    black: '#000',
-  },
-};
-
-const themeDark = {
-  ...MD3DarkTheme,
-  colors: {
-    ...MD3DarkTheme.colors,
-    primary: '#bb86fc',
-    white: '#fff',
-    black: '#000',
-  },
-};
-
+// Tela de login
 export default function Entrar() {
   const theme = useTheme();
-  const { signIn } = useContext(AuthContext);
+  const { signInComEmailESenha } = useContext(AuthContext);
+  // Controla se a senha fica escondida
   const [exibirSenha, setExibirSenha] = useState(true);
   const [logando, setLogando] = useState(false);
   const [dialogVisivel, setDialogVisivel] = useState(false);
   const [mensagemDialog, setMensagemDialog] = useState('');
+  // Formulário com React Hook Form e validação do Yup
   const {
     control,
     handleSubmit,
@@ -69,9 +52,10 @@ export default function Entrar() {
     resolver: yupResolver(schema),
   });
 
-  async function entrar(data: Credencial) {
+  // Faz o login e vai para a Home; se falhar, mostra o erro
+  async function entrarComEmailESenha(data: Credencial) {
     setLogando(true);
-    const response = await signIn(data);
+    const response = await signInComEmailESenha(data);
     if (response === 'ok') {
       setLogando(false);
       router.replace('/(tabs)/home');
@@ -86,7 +70,8 @@ export default function Entrar() {
     <SafeAreaView style={{ ...styles.container, backgroundColor: theme.colors.background }}>
       <ScrollView>
         <>
-          <Image style={styles.image} source={require('../../assets/images/icon.png')} />
+          <Image style={styles.image} source={require('../assets/images/icon.png')} />
+          {/* Campo de email */}
           <Controller
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
@@ -111,6 +96,7 @@ export default function Entrar() {
               {errors.email?.message?.toString()}
             </Text>
           )}
+          {/* Campo de senha */}
           <Controller
             control={control}
             rules={{
@@ -144,6 +130,7 @@ export default function Entrar() {
               {errors.senha?.message?.toString()}
             </Text>
           )}
+          {/* Link para recuperar a senha */}
           <Text
             style={{
               ...styles.textEsqueceuSenha,
@@ -154,16 +141,18 @@ export default function Entrar() {
           >
             Esqueceu sua senha?
           </Text>
+          {/* Botão de login */}
           <Button
             style={styles.button}
             mode="contained"
-            onPress={() => handleSubmit(entrar)()}
+            onPress={() => handleSubmit(entrarComEmailESenha)()}
             loading={logando}
             disabled={logando}
           >
             {!logando ? 'Entrar' : 'Entrando'}
           </Button>
           <Divider />
+          {/* Link para o cadastro */}
           <View style={styles.divCadastro}>
             <Text variant="labelMedium">Não tem uma conta?</Text>
             <Text
@@ -177,6 +166,7 @@ export default function Entrar() {
           </View>
         </>
       </ScrollView>
+      {/* Aviso de erro no login */}
       <Dialog visible={dialogVisivel} onDismiss={() => setDialogVisivel(false)}>
         <Dialog.Icon icon="alert-circle-outline" size={60} />
         <Dialog.Title style={styles.textDialog}>Erro</Dialog.Title>
@@ -190,6 +180,7 @@ export default function Entrar() {
   );
 }
 
+// Estilos da tela de login
 const styles = StyleSheet.create({
   container: {
     flex: 1,

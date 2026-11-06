@@ -20,8 +20,8 @@ There is no test runner configured in this project.
 
 ## Architecture
 
-- **Routing**: Expo Router (file-based), rooted at `src/app/` rather than the top-level `app/`. Expo Router picks `src/app` automatically because there is no root `app/` directory and no `metro.config.js` overriding it. Entry point is `expo-router/entry` (`package.json` `main`).
-- **Path aliases**: `@/*` → `src/*`, `@/assets/*` → `assets/*` (defined in `tsconfig.json`).
+- **Routing**: Expo Router (file-based), rooted at the top-level `app/`, same layout as the professor's example project. Entry point is `expo-router/entry` (`package.json` `main`).
+- **Path aliases**: `@/*` → `./*` (defined in `tsconfig.json`). Source folders live at the root: `app/`, `context/`, `model/`, `firebase/`.
 - **Platform-specific files**: components/hooks are split with the `.web.tsx`/`.web.ts` suffix convention; Metro resolves the right file per platform automatically. Current pairs:
   - `components/app-tabs.tsx` (native tab bar via `expo-router/unstable-native-tabs`) vs `components/app-tabs.web.tsx` (custom floating tab bar built on `expo-router/ui` primitives)
   - `components/animated-icon.tsx` (native splash overlay, drives `expo-splash-screen`) vs `components/animated-icon.web.tsx` (CSS-module-based version, paired with `animated-icon.module.css`)

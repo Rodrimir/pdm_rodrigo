@@ -6,7 +6,7 @@
   "tabWidth": 2,
   "overrides": [
     {
-      "files": "src/context/AuthProvider.tsx",
+      "files": "context/AuthProvider.tsx",
       "options": { "printWidth": 180 }
     }
   ]

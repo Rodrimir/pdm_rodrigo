@@ -1,6 +1,7 @@
 import { KeyboardAvoidingView, StyleSheet, Text } from 'react-native';
 import { useTheme } from 'react-native-paper';
 
+// Tela de recuperação de senha
 export default function RecuperarSenhaScreen() {
   const theme = useTheme();
   return (
@@ -10,6 +11,7 @@ export default function RecuperarSenhaScreen() {
   );
 }
 
+// Estilos da tela de recuperação de senha
 const styles = StyleSheet.create({
   container: {
     flex: 1,

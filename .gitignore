@@ -43,5 +43,6 @@ example
 /ios
 /android
 
-# firebase keys
-/src/firebase/firebaseConfig.ts
+# chave de conta de serviço do Firebase
+*firebase-adminsdk*.json
+credentials.json

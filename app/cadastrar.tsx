@@ -37,8 +37,10 @@ const schema = yup
   })
   .required();
 
+// Tela de cadastro
 export default function SignUpScreen() {
   const theme = useTheme();
+  // Formulário com React Hook Form e validação do Yup
   const {
     control,
     handleSubmit,
@@ -53,14 +55,16 @@ export default function SignUpScreen() {
     mode: 'onSubmit',
     resolver: yupResolver(schema),
   });
-  const { signUp } = useContext<any>(AuthContext);
+  const { signUpComEmailESenha } = useContext<any>(AuthContext);
   const [exibirSenha, setExibirSenha] = useState(true);
   const [requisitando, setRequisitando] = useState(false);
   const [dialogVisivel, setDialogVisivel] = useState(false);
   const [mensagem, setMensagem] = useState({ tipo: '', mensagem: '' });
+  // Foto escolhida no celular, ainda não enviada
   const [urlFotoDevice, setUrlFotoDevice] = useState('');
 
-  async function escolherDaGaleria() {
+  // Pede permissão e abre a galeria para escolher a foto
+  async function escolherFotoDaGaleria() {
     const permissao = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permissao.granted) {
       Alert.alert('Precisamos de permissão para acessar a galeria.');
@@ -77,7 +81,8 @@ export default function SignUpScreen() {
     }
   }
 
-  async function tirarFoto() {
+  // Pede permissão e abre a câmera para tirar a foto
+  async function tirarFotoComCamera() {
     const permissao = await ImagePicker.requestCameraPermissionsAsync();
     if (!permissao.granted) {
       Alert.alert('Precisamos de permissão para acessar a câmera.');
@@ -94,13 +99,14 @@ export default function SignUpScreen() {
     }
   }
 
-  async function cadastrar(data: Usuario) {
+  // Preenche os valores padrão do perfil, cria a conta e mostra o resultado
+  async function cadastrarNovoUsuario(data: Usuario) {
     setRequisitando(true);
     data.idioma = Idioma.ptBR;
     data.tema = Tema.Claro;
     data.fuso = Fuso.brasilia;
     data.urlFoto = '';
-    const msg = await signUp(data, urlFotoDevice);
+    const msg = await signUpComEmailESenha(data, urlFotoDevice);
     if (msg === 'ok') {
       setMensagem({
         tipo: 'ok',
@@ -119,19 +125,21 @@ export default function SignUpScreen() {
     <SafeAreaView style={{ ...styles.container, backgroundColor: theme.colors.background }}>
       <ScrollView>
         <>
+          {/* Prévia da foto e botões para escolher */}
           <Image
             style={styles.image}
-            source={urlFotoDevice ? { uri: urlFotoDevice } : require('../../assets/images/icon.png')}
+            source={urlFotoDevice ? { uri: urlFotoDevice } : require('../assets/images/icon.png')}
           />
           <View style={styles.divButtonsImage}>
-            <Button style={styles.buttonImage} mode="outlined" icon="image" onPress={escolherDaGaleria}>
+            <Button style={styles.buttonImage} mode="outlined" icon="image" onPress={escolherFotoDaGaleria}>
               Galeria
             </Button>
-            <Button style={styles.buttonImage} mode="outlined" icon="camera" onPress={tirarFoto}>
+            <Button style={styles.buttonImage} mode="outlined" icon="camera" onPress={tirarFotoComCamera}>
               Foto
             </Button>
           </View>
 
+          {/* Campo de nome */}
           <Controller
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
@@ -156,6 +164,7 @@ export default function SignUpScreen() {
             </Text>
           )}
 
+          {/* Campo de email */}
           <Controller
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
@@ -181,6 +190,7 @@ export default function SignUpScreen() {
             </Text>
           )}
 
+          {/* Campo de senha */}
           <Controller
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
@@ -205,6 +215,7 @@ export default function SignUpScreen() {
               {errors.senha?.message?.toString()}
             </Text>
           )}
+          {/* Campo de confirmação da senha */}
           <Controller
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
@@ -229,10 +240,11 @@ export default function SignUpScreen() {
               {errors.confirmar_senha?.message?.toString()}
             </Text>
           )}
+          {/* Botão de cadastro */}
           <Button
             style={styles.button}
             mode="contained"
-            onPress={() => handleSubmit(cadastrar)()}
+            onPress={() => handleSubmit(cadastrarNovoUsuario)()}
             loading={requisitando}
             disabled={requisitando}
           >
@@ -240,6 +252,7 @@ export default function SignUpScreen() {
           </Button>
         </>
       </ScrollView>
+      {/* Resultado do cadastro */}
       <Dialog
         visible={dialogVisivel}
         onDismiss={() => {
@@ -266,6 +279,7 @@ export default function SignUpScreen() {
   );
 }
 
+// Estilos da tela de cadastro
 const styles = StyleSheet.create({
   container: {
     flex: 1,
